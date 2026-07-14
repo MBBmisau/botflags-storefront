@@ -25,10 +25,10 @@ export type LocaleDefinition = {
  */
 export const LOCALE_DEFINITIONS = {
 	en: {
-		bcp47: "en-US",
+		bcp47: "en-NG",
 		graphqlLanguageCode: "EN",
 		htmlLang: "en",
-		ogLocale: "en_US",
+		ogLocale: "en_NG",
 	},
 	pl: {
 		bcp47: "pl-PL",
@@ -125,7 +125,7 @@ export const localeConfig = {
 	htmlLang: LOCALE_DEFINITIONS.en.htmlLang,
 	ogLocale: LOCALE_DEFINITIONS.en.ogLocale,
 	available: getLocaleBcp47List(),
-	fallbackCurrency: "USD",
+	fallbackCurrency: "NGN",
 } as const;
 
 export function resolveLocaleFromSlug(slug: string): LocaleDefinition {

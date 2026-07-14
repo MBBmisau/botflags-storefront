@@ -19,6 +19,7 @@ import { RootViews } from "./views/root-views";
 import { CheckoutPaymentHistoryGuard } from "@/checkout/components/checkout-payment-history-guard";
 import { CheckoutSessionCleanup } from "@/checkout/components/checkout-session-cleanup";
 import { StripeCheckoutCompletionHost } from "@/checkout/components/payment/stripe/stripe-checkout-completion-host";
+import { PaystackCheckoutCompletionHost } from "@/checkout/components/payment/paystack/paystack-checkout-completion-host";
 import { CheckoutLoadingFallback } from "@/checkout/views/saleor-checkout";
 import { CheckoutCrashFallback } from "@/checkout/views/page-not-found";
 import "./index.css";
@@ -71,6 +72,9 @@ export function CheckoutApp({
 								<CheckoutPaymentReturnErrorProvider>
 									<Suspense fallback={null}>
 										<StripeCheckoutCompletionHost />
+									</Suspense>
+									<Suspense fallback={null}>
+										<PaystackCheckoutCompletionHost />
 									</Suspense>
 									<ErrorBoundary FallbackComponent={CheckoutCrashFallback}>
 										<Suspense fallback={<CheckoutLoadingFallback />}>

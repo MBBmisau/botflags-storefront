@@ -24,6 +24,7 @@ type GatewayLike = Pick<PaymentGatewayFragment, "id" | "name">;
 
 export type PaymentGatewayStatus =
 	| { kind: "dummy"; gateway: GatewayLike }
+	| { kind: "paystack"; gateway: GatewayLike }
 	| { kind: "stripe"; gateway: GatewayLike }
 	| { kind: "none" }
 	| { kind: "unsupported" }
@@ -38,6 +39,8 @@ export function resolvePaymentGatewayStatus(
 	switch (provider.type) {
 		case "dummy":
 			return { kind: "dummy", gateway: provider.gateway };
+		case "paystack":
+			return { kind: "paystack", gateway: provider.gateway };
 		case "stripe":
 			return { kind: "stripe", gateway: provider.gateway };
 		case "none":

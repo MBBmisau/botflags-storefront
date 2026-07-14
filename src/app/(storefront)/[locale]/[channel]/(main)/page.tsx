@@ -9,6 +9,7 @@ import { PaperSignEditorialPlaceholder } from "@/ui/components/shared/paper-sign
 import { CategoryTileGrid, type CategoryTile } from "@/ui/sections/category-tile-grid/category-tile-grid";
 import { EditorialHero } from "@/ui/sections/editorial-hero/editorial-hero";
 import { FeaturedCollectionSection } from "@/ui/sections/featured-collection-section/featured-collection-section";
+import { FashionHeroCarousel } from "@/ui/sections/fashion-hero-carousel/fashion-hero-carousel";
 import { ImageWithText } from "@/ui/sections/image-with-text/image-with-text";
 import { MediaHero } from "@/ui/sections/media-hero/media-hero";
 import { MulticolumnSection } from "@/ui/sections/multicolumn-section/multicolumn-section";
@@ -85,7 +86,11 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 		(product) => product.slug !== heroProduct?.slug && product.thumbnail?.url,
 	);
 	const editorialFallbackImage = pickImage(editorialProduct);
-	const categoryTiles = buildCategoryTiles(products);
+	const catalogCategoryTiles = buildCategoryTiles(products);
+	const categoryTiles =
+		catalogCategoryTiles.length >= 3
+			? catalogCategoryTiles
+			: (categories.tiles?.map((tile) => ({ ...tile })) ?? catalogCategoryTiles);
 
 	const currency = await resolveChannelCurrency(channel);
 	const policyValues = buildPolicyLabelValues(content.policies, {
@@ -99,7 +104,9 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 
 	return (
 		<>
-			{hero.backgroundImage ? (
+			{hero.slides?.length ? (
+				<FashionHeroCarousel slides={hero.slides} />
+			) : hero.backgroundImage ? (
 				// Art-directed full-bleed media → immersive overlay hero.
 				<MediaHero
 					id="homepage-hero-heading"

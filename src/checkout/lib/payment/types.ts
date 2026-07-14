@@ -22,6 +22,7 @@ export type PaymentContext = {
 };
 
 type IntegratedPaymentProvider =
+	| { type: "paystack"; gateway: PaymentGatewayLike; submitMode: PaymentSubmitMode }
 	| { type: "stripe"; gateway: PaymentGatewayLike; submitMode: PaymentSubmitMode }
 	| { type: "dummy"; gateway: PaymentGatewayLike; submitMode: PaymentSubmitMode };
 
@@ -45,5 +46,5 @@ export type TransactionInitializePayload =
 export function isIntegratedPaymentProvider(
 	provider: ResolvedPaymentProvider,
 ): provider is IntegratedPaymentProvider {
-	return provider.type === "stripe" || provider.type === "dummy";
+	return provider.type === "paystack" || provider.type === "stripe" || provider.type === "dummy";
 }

@@ -6,6 +6,7 @@ import { isIntegratedPaymentProvider, type ResolvedPaymentProvider } from "@/che
 import { type CheckoutPriceChangeNotice } from "@/checkout/lib/payment/checkout-pay-amount";
 import { DummyPaymentPlaceholder } from "./dummy-payment-placeholder";
 import { StripePayment } from "./stripe/stripe-payment";
+import { PaystackPayment } from "./paystack/paystack-payment";
 import { type BillingAddressData } from "./billing-address-section";
 
 export type IntegratedPaymentUiProps = {
@@ -43,6 +44,20 @@ export const IntegratedPaymentUi: FC<IntegratedPaymentUiProps> = ({
 	}
 
 	switch (provider.type) {
+		case "paystack":
+			if (!checkout || !billing || !onPaymentError || !onBillingErrors || !onPriceChangeNotice) {
+				return null;
+			}
+			return (
+				<PaystackPayment
+					checkout={checkout}
+					billing={billing}
+					onPaymentError={onPaymentError}
+					onBillingErrors={onBillingErrors}
+					onPriceChangeNotice={onPriceChangeNotice}
+					onPaymentActivityChange={onPaymentActivityChange}
+				/>
+			);
 		case "dummy":
 			return <DummyPaymentPlaceholder gatewayName={provider.gateway.name} />;
 		case "stripe":

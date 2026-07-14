@@ -82,6 +82,10 @@ import {
 	hasMaterialCheckoutTotalChange,
 } from "@/checkout/lib/payment/checkout-pay-amount";
 import { getStripePaymentGuardError, isStripePaymentEnabled } from "@/checkout/lib/payment/providers/stripe";
+import {
+	getPaystackPaymentGuardError,
+	isPaystackPaymentEnabled,
+} from "@/checkout/lib/payment/providers/paystack";
 import { buildMarketingConsentMetadata } from "@/checkout/lib/marketing-consent";
 import { fetchCheckoutOnServer } from "@/checkout/lib/server/fetch-checkout";
 import { getCheckoutServerTranslations } from "@/checkout/lib/server/get-checkout-server-translations";
@@ -484,6 +488,11 @@ export async function initializeCheckoutTransaction(
 		return { ok: false, error: t("stripeNotEnabled") };
 	}
 
+	const paystackGuardError = getPaystackPaymentGuardError(variables.paymentGateway?.id);
+	if (paystackGuardError) {
+		return { ok: false, error: t("paystackNotEnabled") };
+	}
+
 	// Defense in depth: never trust the client-supplied amount. Saleor re-validates
 	// coverage at checkoutComplete, but rejecting here avoids authorizing a wrong amount.
 	if (typeof variables.amount === "number") {
@@ -528,7 +537,7 @@ export async function processCheckoutTransaction(
 	// Mirror the initialize guards: when every integrated gateway is disabled for this
 	// environment, a direct call to this action must not drive transactions either.
 	// Forks adding gateways should extend this check alongside the initialize guards.
-	if (!isStripePaymentEnabled() && !isDummyPaymentAllowed()) {
+	if (!isPaystackPaymentEnabled() && !isStripePaymentEnabled() && !isDummyPaymentAllowed()) {
 		const { server: t } = await getCheckoutServerTranslations();
 		return { ok: false, error: t("paymentsDisabled") };
 	}

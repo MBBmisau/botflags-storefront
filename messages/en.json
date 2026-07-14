@@ -542,7 +542,13 @@
 			"authorizedBody": "Your payment is authorized (capture happens when we fulfill the order). Tap below to place your order — you will not be charged again at checkout.",
 			"freeOrderBody": "Your order total is {total}. No payment is required — confirm below to place your order.",
 			"dummyTestMode": "Test mode. No card details needed — use Pay to complete a test order.",
-			"stripeLoadTitle": "Could not load Stripe"
+			"stripeLoadTitle": "Could not load Stripe",
+			"paystackRedirect": "Continue securely to Paystack",
+			"paystackRedirecting": "Opening Paystack…",
+			"paystackIntro": "Continue to Paystack to choose card, bank, transfer, or another available payment method.",
+			"paystackOnlyNgn": "Paystack is available only for NGN checkout.",
+			"paystackDetailsUnavailable": "Paystack did not return a secure payment link. Please try again.",
+			"paystackReturnFailed": "We could not verify your Paystack payment. Do not pay again; contact support if you were debited."
 		},
 		"confirmation": {
 			"orderNumber": "Order #{number}",
@@ -571,7 +577,8 @@
 			"validationRulesUnavailable": "Validation rules not available",
 			"setDefaultAddressFailed": "Failed to set default address",
 			"dummyNotAllowed": "Test payment is not available in this environment.",
-			"stripeNotEnabled": "Stripe payments are not enabled in this environment. Set NEXT_PUBLIC_ENABLE_STRIPE_PAYMENTS=true on the storefront."
+			"stripeNotEnabled": "Stripe payments are not enabled in this environment. Set NEXT_PUBLIC_ENABLE_STRIPE_PAYMENTS=true on the storefront.",
+			"paystackNotEnabled": "Paystack payments are not enabled in this environment."
 		},
 		"gateways": {
 			"noneTitle": "No payment gateway configured",

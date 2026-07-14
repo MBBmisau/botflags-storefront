@@ -5,7 +5,7 @@ import { Lock } from "lucide-react";
 import { useCheckoutContent } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
-export type PaymentTrustProvider = "stripe" | "default";
+export type PaymentTrustProvider = "paystack" | "stripe" | "default";
 
 export type PaymentTrustSignalsProps = {
 	/** `compact` for the mobile sticky pay bar; `default` above inline pay buttons. */
@@ -30,7 +30,7 @@ export const PaymentTrustSignals: FC<PaymentTrustSignalsProps> = ({
 	return (
 		<p
 			className={cn(
-				"text-muted-foreground/80 flex items-center justify-center gap-1.5 text-center text-xs leading-tight",
+				"flex items-center justify-center gap-1.5 text-center text-xs leading-tight text-muted-foreground/80",
 				isCompact && "flex-wrap",
 				className,
 			)}
@@ -38,7 +38,7 @@ export const PaymentTrustSignals: FC<PaymentTrustSignalsProps> = ({
 		>
 			<Lock className="h-3.5 w-3.5 shrink-0" aria-hidden />
 			<span>{trust.secureCheckout}</span>
-			{provider === "stripe" ? (
+			{provider === "stripe" || provider === "paystack" ? (
 				<>
 					<span aria-hidden className="text-muted-foreground/50">
 						·

@@ -8,12 +8,17 @@ import {
 	isStripeGateway,
 	isStripePaymentEnabled,
 } from "@/checkout/lib/payment/providers/stripe";
+import {
+	findPaystackGateway,
+	isPaystackGateway,
+	isPaystackPaymentEnabled,
+} from "@/checkout/lib/payment/providers/paystack";
 import { type PaymentGatewayLike, type PaymentSubmitMode } from "./types";
 
 /** Built-in gateways this UI does not integrate with but should not block checkout. */
 export const IGNORABLE_GATEWAY_IDS = ["saleor.io.gift-card-payment-gateway"] as const;
 
-export type IntegratedGatewayType = "stripe" | "dummy";
+export type IntegratedGatewayType = "paystack" | "stripe" | "dummy";
 
 type IntegratedGatewayDefinition = {
 	type: IntegratedGatewayType;
@@ -28,6 +33,13 @@ type IntegratedGatewayDefinition = {
  * Add a new Saleor payment app here plus its provider module and UI component.
  */
 export const INTEGRATED_GATEWAYS: readonly IntegratedGatewayDefinition[] = [
+	{
+		type: "paystack",
+		submitMode: "client",
+		findGateway: (gateways) => findPaystackGateway(gateways),
+		isEnabled: isPaystackPaymentEnabled,
+		matchesGateway: (gateway) => isPaystackGateway(gateway.id),
+	},
 	{
 		type: "stripe",
 		submitMode: "client",

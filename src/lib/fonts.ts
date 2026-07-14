@@ -1,6 +1,6 @@
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { Fraunces } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import { isEditorialTypography } from "@/config/typography-theme";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,13 @@ const frauncesDisplay = Fraunces({
 	variable: "--font-fraunces",
 	display: "swap",
 	adjustFontFallback: true,
+});
+
+/** Botflags' clean geometric display/body face, shared by every app surface. */
+const manrope = Manrope({
+	subsets: ["latin"],
+	variable: "--font-manrope",
+	display: "swap",
 });
 
 export type RootHtmlFontProps = {
@@ -26,7 +33,13 @@ export function getRootHtmlFontProps(htmlLang: string): RootHtmlFontProps {
 
 	return {
 		lang: htmlLang,
-		className: cn(GeistSans.variable, GeistMono.variable, editorial && frauncesDisplay.variable, "min-h-dvh"),
+		className: cn(
+			GeistSans.variable,
+			GeistMono.variable,
+			manrope.variable,
+			editorial && frauncesDisplay.variable,
+			"min-h-dvh",
+		),
 		suppressHydrationWarning: true,
 		...(editorial ? { "data-typography": "editorial" as const } : {}),
 	};

@@ -20,6 +20,7 @@ export async function executePayment(
 		case "dummy":
 			return executeDummyPayment(context, provider.gateway.id, messages);
 		case "stripe":
+		case "paystack":
 			return {
 				ok: false,
 				error: messages.stripeUseCardForm,

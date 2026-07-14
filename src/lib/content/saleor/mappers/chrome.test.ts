@@ -5,7 +5,7 @@ import { mapChromePage } from "@/lib/content/saleor/mappers/chrome";
 import type { StorefrontContentPageFragment } from "@/gql/graphql";
 
 describe("mapChromePage", () => {
-	it("keeps empty announcement id when Saleor only sets message", () => {
+	it("keeps the configured announcement id when Saleor only sets message", () => {
 		const page: StorefrontContentPageFragment = {
 			slug: "storefront-chrome",
 			isPublished: true,
@@ -16,7 +16,7 @@ describe("mapChromePage", () => {
 		const merged = mergeStorefrontContent(defaultStorefrontContent, mapChromePage(page));
 
 		expect(merged.chrome.announcementBar.message).toBe("Sale on now");
-		expect(merged.chrome.announcementBar.id).toBe("");
+		expect(merged.chrome.announcementBar.id).toBe("botflags-nigeria-launch");
 	});
 
 	it("maps nav labels without announcement message", () => {

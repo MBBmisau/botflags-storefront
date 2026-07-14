@@ -48,6 +48,21 @@ export type HomepageHeroContent = {
 	primaryCtaLabel: string;
 	/** Set only when Saleor storefront-homepage model provides hero-image (FILE). */
 	backgroundImage?: string | null;
+	/** Optional photography-led campaign slides. Code defaults remain the fallback for Saleor Models. */
+	slides?: readonly HomepageHeroSlideContent[];
+};
+
+export type HomepageHeroSlideContent = {
+	id: string;
+	eyebrow?: string;
+	heading: string;
+	subheading?: string;
+	image: string;
+	imageAlt: string;
+	primaryCtaLabel: string;
+	primaryCtaHref: string;
+	secondaryCtaLabel?: string;
+	secondaryCtaHref?: string;
 };
 
 export type HomepageFeaturedCollectionContent = {
@@ -90,6 +105,15 @@ export type HomepageEditorialContent = {
 export type HomepageCategoriesContent = {
 	heading: string;
 	eyebrow?: string;
+	/** Demo fallback used until category background media has been merchandised in Saleor. */
+	tiles?: readonly HomepageCategoryTileContent[];
+};
+
+export type HomepageCategoryTileContent = {
+	title: string;
+	href: string;
+	image: string;
+	imageAlt: string;
 };
 
 export type HomepagePhotoCredit = {

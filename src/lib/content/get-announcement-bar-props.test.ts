@@ -24,7 +24,7 @@ describe("buildAnnouncementBarContent", () => {
 			localeSlug: "en",
 		});
 
-		expect(props.message).toBe("Free shipping on orders over $75.00");
+		expect(props.message).toBe("Free shipping on orders over US$150,000.00");
 		expect(props.id).toBe("summer-sale");
 		expect(props.href).toBe("/collections/sale");
 		expect(props.dismissible).toBe(true);
@@ -37,7 +37,7 @@ describe("buildAnnouncementBarContent", () => {
 		});
 
 		expect(props.linkLabel).toBe("Shop sale");
-		expect(props.message).toContain("75");
+		expect(props.message).toContain("150");
 		expect(props.message).not.toContain("{freeShippingThreshold}");
 	});
 });

@@ -180,8 +180,8 @@ describe("storefront content revalidation helpers", () => {
 		expect(planStorefrontContentRevalidation("storefront-homepage", ["us", "uk"], null)).toEqual({
 			action: "revalidate",
 			tags: [
-				{ tag: "storefront-content:us:en-US", profile: "menus" },
-				{ tag: "storefront-content:uk:en-US", profile: "menus" },
+				{ tag: "storefront-content:us:en-NG", profile: "menus" },
+				{ tag: "storefront-content:uk:en-NG", profile: "menus" },
 			],
 			paths: ["/en/us", "/en/uk"],
 		});
@@ -190,7 +190,7 @@ describe("storefront content revalidation helpers", () => {
 	it("revalidates a single channel for {pageType}-{channel} slug", () => {
 		expect(planStorefrontContentRevalidation("storefront-homepage-us", ["us", "uk"], null)).toEqual({
 			action: "revalidate",
-			tags: [{ tag: "storefront-content:us:en-US", profile: "menus" }],
+			tags: [{ tag: "storefront-content:us:en-NG", profile: "menus" }],
 			paths: ["/en/us"],
 		});
 	});

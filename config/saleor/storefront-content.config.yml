@@ -230,15 +230,15 @@ models:
     modelType: Storefront — Policies
     isPublished: true
     attributes:
-      Free shipping threshold: 75
+      Free shipping threshold: 150000
       Returns window days: 30
   - title: Storefront Chrome
     slug: storefront-chrome
     modelType: Storefront — Chrome
     isPublished: true
     attributes:
-      Announcement ID: ""
-      Announcement message: Free shipping on orders over {freeShippingThreshold}
+      Announcement ID: botflags-nigeria-launch
+      Announcement message: Free delivery across Nigeria on orders over {freeShippingThreshold}
       Announcement dismissible: true
       Nav all products label: All
       Nav view all label: View all {label}
@@ -247,39 +247,40 @@ models:
     modelType: Storefront — Products
     isPublished: true
     attributes:
-      Listing title: All Products
-      Listing description: Discover our full collection of premium products.
+      Listing title: Shop Botflags
+      Listing description: Explore our current fashion edit, with delivery across Nigeria.
   - title: Storefront Homepage
     slug: storefront-homepage
     modelType: Storefront — Homepage
     isPublished: true
     attributes:
-      Hero eyebrow: ""
-      Hero heading: Discover our collection
-      Hero subheading: Premium products with exceptional quality. Discover our curated collection.
-      Hero CTA label: Shop all
-      Featured heading: Featured products
+      Hero eyebrow: Botflags Edit 2026
+      Hero heading: Everyday style, made confident
+      Hero subheading: Confident fashion for everyday Nigerian life.
+      Hero CTA label: Shop the collection
+      Featured heading: Popular right now
       Featured collection: featured-products
       Featured limit: 8
       Categories heading: Shop by category
-      Categories eyebrow: ""
-      Brand story heading: Built for real commerce
-      Brand story paragraph 1: Paper is a minimal, production-ready storefront for Saleor — clean as a
-        blank page, built to ship.
-      Brand story paragraph 2: Customize sections in code, connect your catalog, and keep checkout, cart,
-        and product pages battle-tested out of the box.
+      Categories eyebrow: Find your style
+      Brand story heading: Style that moves with you
+      Brand story paragraph 1: Botflags brings together expressive, wearable pieces for people who want to
+        look considered without feeling overdone.
+      Brand story paragraph 2: This protected preview uses a temporary fashion collection while we prepare
+        the final Botflags product range and photography.
       Values heading: Why shop with us
       Values columns desktop: 3
-      Values column 1 title: Curated quality
-      Values column 1 text: Every product is selected for craftsmanship and longevity — not trend-chasing.
-      Values column 2 title: Fast fulfillment
-      Values column 2 text: Orders ship from regional warehouses with tracking from checkout to delivery.
-      Values column 3 title: Easy returns
-      Values column 3 text: Hassle-free returns within {returnsWindowDays} days. We stand behind what we sell.
-      Editorial heading: Designed to last
-      Editorial paragraph 1: Thoughtful materials and timeless silhouettes — pieces you'll reach for season after season.
-      Editorial image position: right
-      Editorial CTA label: Explore collections
+      Values column 1 title: Curated style
+      Values column 1 text: A focused edit of versatile pieces, selected to work harder in your wardrobe.
+      Values column 2 title: Nigeria-wide delivery
+      Values column 2 text: Clear state-based delivery pricing, with free delivery from {freeShippingThreshold}.
+      Values column 3 title: Real support
+      Values column 3 text: Questions about an order? Reach Botflags directly at support@botflags.com.
+      Editorial heading: Fresh looks, confident energy
+      Editorial paragraph 1: From polished tailoring to bold occasion pieces, discover an edit designed to
+        make getting dressed feel easy.
+      Editorial image position: left
+      Editorial CTA label: Explore new arrivals
       Photo credits: "[]"
   - title: Storefront Cart
     slug: storefront-cart
@@ -307,4 +308,4 @@ models:
       Empty session message: Add items from the store, then return here to complete your purchase.
       Marketing opt-in label: Email me with news and offers
       Trust secure checkout: Secure checkout
-      Trust Stripe processor: Payments processed by Stripe
+      Trust Stripe processor: Secure payments powered by Paystack

@@ -13,7 +13,6 @@ import { getStorefrontContent } from "@/lib/content/server";
 import { getStorefrontLocaleOptions } from "@/lib/locale-display";
 import { FooterMenuColumns } from "./footer-menu-columns";
 import { CopyrightText } from "./copyright-text";
-import { FooterAttribution } from "./footer-attribution";
 import { FooterPhotoCredits } from "./footer-photo-credits";
 import { brandConfig } from "@/config/brand";
 import { Logo } from "./shared/logo";
@@ -49,6 +48,20 @@ export async function Footer({ locale, channel }: { locale: string; channel: str
 							<Logo className="h-7 w-auto" inverted />
 						</Link>
 						<p className="mt-4 max-w-xs text-sm leading-relaxed text-inverse-subtle">{brandConfig.tagline}</p>
+						<div className="mt-5 space-y-2 text-sm">
+							<a
+								className="block text-inverse-subtle transition-colors hover:text-background"
+								href={`mailto:${brandConfig.supportEmail}`}
+							>
+								{brandConfig.supportEmail}
+							</a>
+							<a
+								className="block text-inverse-subtle transition-colors hover:text-background"
+								href={brandConfig.supportPhoneHref}
+							>
+								{brandConfig.supportPhone}
+							</a>
+						</div>
 					</div>
 
 					<FooterMenuColumns items={footerMenuItems} />
@@ -67,19 +80,18 @@ export async function Footer({ locale, channel }: { locale: string; channel: str
 						<p className="text-xs text-inverse-muted">
 							<CopyrightText />
 						</p>
-						<FooterAttribution />
 						<FooterPhotoCredits credits={content.surfaces.homepage.photoCredits} />
 					</div>
 					<div className="flex items-center gap-6">
 						<Link
-							href="/privacy"
+							href={buildStorefrontPath(locale, channel, "/privacy")}
 							prefetch={false}
 							className="text-xs text-inverse-muted transition-colors hover:text-inverse-subtle"
 						>
 							Privacy Policy
 						</Link>
 						<Link
-							href="/terms"
+							href={buildStorefrontPath(locale, channel, "/terms")}
 							prefetch={false}
 							className="text-xs text-inverse-muted transition-colors hover:text-inverse-subtle"
 						>
