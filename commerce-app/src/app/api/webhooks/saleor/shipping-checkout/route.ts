@@ -8,7 +8,7 @@ export const POST = shippingCheckoutWebhook.createHandler(async (_request, conte
 		countryCode: checkout.shippingAddress?.country?.code,
 		countryArea: checkout.shippingAddress?.countryArea,
 		subtotal: checkout.subtotalPrice?.gross?.amount,
-		currency: checkout.channel.currencyCode,
+		currency: checkout.subtotalPrice?.gross?.currency ?? checkout.channel.currencyCode,
 	});
 	return Response.json(
 		rate

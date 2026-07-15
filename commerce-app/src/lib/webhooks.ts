@@ -154,6 +154,18 @@ const checkoutFilterQuery = gql`
 						slug
 						currencyCode
 					}
+					shippingAddress {
+						countryArea
+						country {
+							code
+						}
+					}
+					subtotalPrice {
+						gross {
+							amount
+							currency
+						}
+					}
 				}
 				shippingMethods {
 					id
