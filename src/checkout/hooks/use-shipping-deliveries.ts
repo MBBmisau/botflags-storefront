@@ -24,7 +24,7 @@ export function useShippingDeliveries(checkout: ServerCheckout | null, isActive:
 			try {
 				const result = await calculateDeliveryOptions(checkout.id);
 				if (result.ok) {
-					setDeliveries(result.deliveries);
+					setDeliveries(result.deliveries.filter((delivery) => delivery.shippingMethod?.active));
 				} else {
 					setDeliveries([]);
 				}
