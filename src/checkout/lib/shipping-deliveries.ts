@@ -6,13 +6,25 @@ export function shippingDeliveriesCacheKey(checkout: ServerCheckout): string | n
 	return `${checkout.id}:${addressId}`;
 }
 
-/** Pick a delivery id from user selection, saved checkout, or first available option. */
+/**
+ * Saleor 3.23 accepts both IDs, but the shipping method ID remains stable when
+ * external delivery options are recalculated between display and selection.
+ */
+export function deliverySelectionId(delivery: DeliveryOption): string {
+	return delivery.shippingMethod?.id ?? delivery.id;
+}
+
+/** Pick a shipping method id from user selection, saved checkout, or first available option. */
 export function resolveSelectedDeliveryId(
 	current: string | undefined,
 	deliveries: DeliveryOption[],
-	savedDeliveryId: string | undefined,
+	savedDeliveryMethodId: string | undefined,
 ): string | undefined {
-	if (current && deliveries.some((d) => d.id === current)) return current;
-	if (savedDeliveryId && deliveries.some((d) => d.id === savedDeliveryId)) return savedDeliveryId;
-	return deliveries[0]?.id;
+	if (current && deliveries.some((delivery) => deliverySelectionId(delivery) === current)) return current;
+	if (
+		savedDeliveryMethodId &&
+		deliveries.some((delivery) => deliverySelectionId(delivery) === savedDeliveryMethodId)
+	)
+		return savedDeliveryMethodId;
+	return deliveries[0] ? deliverySelectionId(deliveries[0]) : undefined;
 }

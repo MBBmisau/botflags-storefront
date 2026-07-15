@@ -8,7 +8,7 @@ import { updateCheckoutDeliveryMethod } from "@/app/(checkout)/actions";
 import { type CheckoutFragment } from "@/checkout/graphql";
 import type { DeliveryOption, ServerCheckout } from "@/checkout/lib/checkout-types";
 import { hasDeliveryProblem } from "@/checkout/lib/delivery-problems";
-import { resolveSelectedDeliveryId } from "@/checkout/lib/shipping-deliveries";
+import { deliverySelectionId, resolveSelectedDeliveryId } from "@/checkout/lib/shipping-deliveries";
 import {
 	CheckoutSummaryContext,
 	buildShippingSummaryRows,
@@ -43,16 +43,16 @@ export const ShippingStep: FC<ShippingStepProps> = ({
 		[checkout, summaryLabels],
 	);
 	const hasShippingAddress = !!checkout.shippingAddress;
-	const savedDeliveryId = checkout.delivery?.id;
+	const savedDeliveryMethodId = checkout.delivery?.shippingMethod?.id;
 
 	const [userSelectedMethod, setUserSelectedMethod] = useState<string | undefined>();
-	const selectedMethod = resolveSelectedDeliveryId(userSelectedMethod, deliveries, savedDeliveryId);
+	const selectedMethod = resolveSelectedDeliveryId(userSelectedMethod, deliveries, savedDeliveryMethodId);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	const showInvalidWarning =
 		hasDeliveryProblem(checkout, "CheckoutProblemDeliveryMethodInvalid") &&
-		selectedMethod === savedDeliveryId;
+		selectedMethod === savedDeliveryMethodId;
 
 	const handleSubmit = useCallback(
 		async (event?: React.FormEvent) => {
@@ -69,7 +69,7 @@ export const ShippingStep: FC<ShippingStepProps> = ({
 			setError(null);
 
 			try {
-				if (selectedMethod !== savedDeliveryId) {
+				if (selectedMethod !== savedDeliveryMethodId) {
 					const result = await updateCheckoutDeliveryMethod(checkout.id, selectedMethod);
 					if (!result.ok) {
 						setError(
@@ -87,7 +87,7 @@ export const ShippingStep: FC<ShippingStepProps> = ({
 				setIsSubmitting(false);
 			}
 		},
-		[selectedMethod, savedDeliveryId, onComplete, checkout, isSubmitting, t],
+		[selectedMethod, savedDeliveryMethodId, onComplete, checkout, isSubmitting, t],
 	);
 
 	const showSpinner = isLoadingDeliveries && !isSubmitting && deliveries.length === 0;
@@ -136,8 +136,9 @@ export const ShippingStep: FC<ShippingStepProps> = ({
 						{deliveries.map((delivery) => {
 							const method = delivery.shippingMethod;
 							if (!method) return null;
+							const selectionId = deliverySelectionId(delivery);
 
-							const isSelected = selectedMethod === delivery.id;
+							const isSelected = selectedMethod === selectionId;
 							const name = method.name.toLowerCase();
 							const Icon =
 								name.includes("express") || name.includes("fast")
@@ -155,17 +156,17 @@ export const ShippingStep: FC<ShippingStepProps> = ({
 										"flex cursor-pointer items-center gap-4 rounded-lg border p-4 transition-colors",
 										"focus-within:ring-2 focus-within:ring-foreground focus-within:ring-offset-2",
 										isSelected
-											? "bg-secondary/50 border-foreground"
-											: "hover:border-muted-foreground/50 border-border",
+											? "border-foreground bg-secondary/50"
+											: "border-border hover:border-muted-foreground/50",
 									)}
 								>
 									<input
 										type="radio"
 										name="shipping"
-										value={delivery.id}
+										value={selectionId}
 										checked={isSelected}
 										onChange={() => {
-											setUserSelectedMethod(delivery.id);
+											setUserSelectedMethod(selectionId);
 											setError(null);
 										}}
 										className="sr-only"
