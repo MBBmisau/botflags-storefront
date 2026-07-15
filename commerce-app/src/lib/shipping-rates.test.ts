@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FREE_SHIPPING_THRESHOLD, resolveShippingRate } from "./shipping-rates";
+import { FREE_SHIPPING_THRESHOLD, resolveShippingRate, sumCheckoutLineTotals } from "./shipping-rates";
 
 const quote = (state: string, subtotal = 20_000) =>
 	resolveShippingRate({ countryCode: "NG", countryArea: state, currency: "NGN", subtotal });
@@ -35,5 +35,20 @@ describe("resolveShippingRate", () => {
 		{ countryCode: "NG", countryArea: "Lagos", currency: "USD" },
 	])("returns no method for invalid address/currency input", (input) => {
 		expect(resolveShippingRate({ ...input, subtotal: 20_000 })).toBeNull();
+	});
+});
+
+describe("sumCheckoutLineTotals", () => {
+	it("sums Saleor's line totals without multiplying quantities again", () => {
+		expect(
+			sumCheckoutLineTotals([
+				{ undiscountedTotalPrice: { amount: 48_000 } },
+				{ undiscountedTotalPrice: { amount: 30_000 } },
+			]),
+		).toBe(78_000);
+	});
+
+	it("handles missing line totals", () => {
+		expect(sumCheckoutLineTotals([{}, { undiscountedTotalPrice: null }])).toBe(0);
 	});
 });

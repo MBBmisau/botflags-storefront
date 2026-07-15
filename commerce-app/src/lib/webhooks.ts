@@ -31,7 +31,9 @@ export type ShippingCheckoutPayload = {
 		id: string;
 		channel: { slug: string; currencyCode: string };
 		shippingAddress?: { countryArea?: string | null; country?: { code?: string | null } | null } | null;
-		subtotalPrice?: { gross?: { amount?: number | null; currency?: string | null } | null } | null;
+		lines?: Array<{
+			undiscountedTotalPrice?: { amount?: number | null; currency?: string | null } | null;
+		}> | null;
 	} | null;
 };
 
@@ -132,8 +134,8 @@ const shippingCheckoutQuery = gql`
 							code
 						}
 					}
-					subtotalPrice {
-						gross {
+					lines {
+						undiscountedTotalPrice {
 							amount
 							currency
 						}
@@ -160,8 +162,8 @@ const checkoutFilterQuery = gql`
 							code
 						}
 					}
-					subtotalPrice {
-						gross {
+					lines {
+						undiscountedTotalPrice {
 							amount
 							currency
 						}

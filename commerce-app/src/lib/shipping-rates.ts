@@ -76,6 +76,12 @@ export type BotflagsShippingRate = {
 	description: string;
 };
 
+export function sumCheckoutLineTotals(
+	lines?: Array<{ undiscountedTotalPrice?: { amount?: number | null } | null }> | null,
+): number {
+	return (lines ?? []).reduce((total, line) => total + (line.undiscountedTotalPrice?.amount ?? 0), 0);
+}
+
 export function resolveShippingRate(input: {
 	countryCode?: string | null;
 	countryArea?: string | null;

@@ -1,4 +1,4 @@
-import { resolveShippingRate } from "@/lib/shipping-rates";
+import { resolveShippingRate, sumCheckoutLineTotals } from "@/lib/shipping-rates";
 import { shippingCheckoutWebhook } from "@/lib/webhooks";
 
 export const POST = shippingCheckoutWebhook.createHandler(async (_request, context) => {
@@ -7,8 +7,8 @@ export const POST = shippingCheckoutWebhook.createHandler(async (_request, conte
 	const rate = resolveShippingRate({
 		countryCode: checkout.shippingAddress?.country?.code,
 		countryArea: checkout.shippingAddress?.countryArea,
-		subtotal: checkout.subtotalPrice?.gross?.amount,
-		currency: checkout.subtotalPrice?.gross?.currency ?? checkout.channel.currencyCode,
+		subtotal: sumCheckoutLineTotals(checkout.lines),
+		currency: checkout.channel.currencyCode,
 	});
 	return Response.json(
 		rate
