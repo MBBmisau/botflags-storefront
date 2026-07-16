@@ -11,6 +11,7 @@ import { Label } from "@/ui/components/ui/label";
 import { buildAccountConfirmationRedirectUrl } from "@/lib/auth/account-confirmation-url";
 import { buildStorefrontPath } from "@/lib/storefront-path";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics/gtag";
 
 export function SignUpForm() {
 	const t = useTranslations("account");
@@ -82,6 +83,12 @@ export function SignUpForm() {
 				return;
 			}
 
+			if (!data.user?.id) {
+				setError(t("errors.createAccountFailed"));
+				return;
+			}
+
+			trackEvent("sign_up", { method: "email" });
 			setSuccess(true);
 		} catch {
 			setError(t("errors.generic"));
@@ -138,7 +145,7 @@ export function SignUpForm() {
 
 				<form onSubmit={handleSubmit} className="space-y-4">
 					{error && (
-						<div role="alert" className="bg-destructive/10 rounded-md p-3 text-sm text-destructive">
+						<div role="alert" className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
 							{error}
 						</div>
 					)}

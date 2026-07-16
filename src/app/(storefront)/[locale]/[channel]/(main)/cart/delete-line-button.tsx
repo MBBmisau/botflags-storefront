@@ -27,7 +27,7 @@ export const DeleteLineButton = ({ deleteLine, item, currency }: Props) => {
 				if (isPending) return;
 				trackEvent("remove_from_cart", {
 					currency,
-					value: item.price * (item.quantity ?? 1),
+					value: (item.price ?? 0) * (item.quantity ?? 1),
 					items: [item],
 				});
 				startTransition(() => {

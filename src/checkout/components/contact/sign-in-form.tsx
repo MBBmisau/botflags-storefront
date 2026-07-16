@@ -8,6 +8,7 @@ import { Button } from "@/ui/components/ui/button";
 import { Input } from "@/ui/components/ui/input";
 import { requestCheckoutPasswordReset } from "@/app/(checkout)/actions";
 import { contactFieldAttributes } from "@/checkout/lib/consts/input-attributes";
+import { trackEvent } from "@/lib/analytics/gtag";
 
 export interface SignInFormProps {
 	/** Pre-filled email address */
@@ -58,6 +59,7 @@ export const SignInForm: FC<SignInFormProps> = ({
 					err.message?.toLowerCase().includes("credentials");
 				setError(isInvalidCredentials ? t("errors.invalidCredentials") : t("errors.signInFailed"));
 			} else if (result.ok) {
+				trackEvent("login", { method: "email" });
 				await onSuccess();
 			} else {
 				setError(t("errors.signInFailed"));
@@ -121,7 +123,7 @@ export const SignInForm: FC<SignInFormProps> = ({
 				</p>
 			</div>
 
-			{error && <div className="bg-destructive/10 rounded-md p-3 text-sm text-destructive">{error}</div>}
+			{error && <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
 
 			{successMessage && (
 				<div className="rounded-md bg-green-100 p-3 text-sm text-green-800">{successMessage}</div>

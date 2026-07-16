@@ -9,13 +9,16 @@ import { formatProductPrice } from "./format-product-price";
 import { formatPrice } from "./utils";
 import { PLP_IMAGE_SIZES, PRODUCT_IMAGE_QUALITY } from "@/lib/images";
 import type { ProductCardData } from "./product-card-data";
-import { productCardToAnalyticsItem } from "@/ui/components/analytics/ecommerce-trackers";
+import { productCardToAnalyticsItem } from "@/lib/analytics/ecommerce";
 import { trackEvent } from "@/lib/analytics/gtag";
 
 export interface ProductCardBaseProps {
 	product: ProductCardData;
 	priority?: boolean;
 	imageSizes?: string;
+	listId?: string;
+	listName?: string;
+	index?: number;
 	/** Slot over the image (e.g. quick-add). Rendered outside the image link so clicks work. */
 	imageOverlay?: ReactNode;
 }
@@ -25,14 +28,18 @@ export function ProductCardBase({
 	priority = false,
 	imageSizes = PLP_IMAGE_SIZES,
 	imageOverlay,
+	listId = "product-grid",
+	listName = "Product grid",
+	index,
 }: ProductCardBaseProps) {
 	const trackSelection = () => {
 		const item = {
 			...productCardToAnalyticsItem(product),
-			item_list_id: "product-grid",
-			item_list_name: "Product grid",
+			item_list_id: listId,
+			item_list_name: listName,
+			index,
 		};
-		trackEvent("select_item", { currency: product.currency, value: product.price, items: [item] });
+		trackEvent("select_item", { currency: product.currency, value: item.price ?? 0, items: [item] });
 	};
 
 	return (

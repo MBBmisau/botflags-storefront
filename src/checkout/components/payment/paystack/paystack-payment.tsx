@@ -30,7 +30,7 @@ import { storePaystackTransactionId } from "@/checkout/lib/payment/paystack-tran
 import { updateCheckoutBilling } from "@/checkout/lib/payment/update-billing";
 import { Button } from "@/ui/components/ui/button";
 import { LoadingSpinner } from "@/checkout/ui-kit/loading-spinner";
-import { commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
+import { cartValue, commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
 import { trackEvent } from "@/lib/analytics/gtag";
 
 type PaystackBillingContext = {
@@ -110,13 +110,6 @@ export const PaystackPayment: FC<PaystackPaymentProps> = ({
 				return;
 			}
 
-			trackEvent("add_payment_info", {
-				currency,
-				value: amount,
-				payment_type: "Paystack",
-				items: liveCheckout.lines.map(commerceLineToAnalyticsItem),
-			});
-
 			const result = await getCheckoutTransport().initializeTransaction({
 				checkoutId: liveCheckout.id,
 				amount,
@@ -138,6 +131,14 @@ export const PaystackPayment: FC<PaystackPaymentProps> = ({
 				onPaymentError(t("paystackDetailsUnavailable"));
 				return;
 			}
+
+			trackEvent("add_payment_info", {
+				currency,
+				value: cartValue(liveCheckout.lines),
+				coupon: liveCheckout.voucherCode || undefined,
+				payment_type: "Paystack",
+				items: liveCheckout.lines.map(commerceLineToAnalyticsItem),
+			});
 
 			storePaystackTransactionId(transactionId);
 			markPaymentCompleting(liveCheckout.id);

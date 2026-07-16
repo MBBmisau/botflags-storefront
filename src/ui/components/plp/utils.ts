@@ -62,8 +62,10 @@ export function toProductCardData(
 	channel: string,
 ): ProductCardData {
 	const startPrice = product.pricing?.priceRange?.start?.gross;
+	const analyticsStartPrice = product.pricing?.priceRange?.start?.net;
 	const stopPrice = product.pricing?.priceRange?.stop?.gross;
 	const undiscountedStartPrice = product.pricing?.priceRangeUndiscounted?.start?.gross;
+	const analyticsUndiscountedStartPrice = product.pricing?.priceRangeUndiscounted?.start?.net;
 	const startAmount = startPrice?.amount ?? 0;
 	const stopAmount = stopPrice?.amount;
 
@@ -91,6 +93,9 @@ export function toProductCardData(
 		slug: product.slug,
 		brand: categoryName,
 		price: startAmount,
+		analyticsPrice: analyticsStartPrice?.amount ?? startAmount,
+		analyticsCompareAtPrice: analyticsUndiscountedStartPrice?.amount,
+		analyticsItemId: product.variants?.[0]?.sku || product.variants?.[0]?.id || product.id,
 		priceStop: stopAmount != null && stopAmount !== startAmount ? stopAmount : null,
 		compareAtPrice: isSale ? undiscountedStartAmount : null,
 		discountPercent,

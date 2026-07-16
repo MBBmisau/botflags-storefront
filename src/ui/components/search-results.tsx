@@ -13,5 +13,5 @@ export function SearchResults({ products }: SearchResultsProps) {
 		return null;
 	}
 
-	return <ProductGrid products={products} />;
+	return <ProductGrid products={products} listId="search-results" listName="Search results" />;
 }

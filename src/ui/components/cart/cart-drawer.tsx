@@ -159,7 +159,7 @@ export function CartDrawer({
 			const item = commerceLineToAnalyticsItem(line);
 			trackEvent("remove_from_cart", {
 				currency: line.totalPrice.gross.currency,
-				value: item.price * (item.quantity ?? 1),
+				value: (item.price ?? 0) * (item.quantity ?? 1),
 				items: [item],
 			});
 		}
@@ -173,7 +173,7 @@ export function CartDrawer({
 			const item = { ...commerceLineToAnalyticsItem(line), quantity: 1 };
 			trackEvent(newQuantity > line.quantity ? "add_to_cart" : "remove_from_cart", {
 				currency: line.totalPrice.gross.currency,
-				value: item.price,
+				value: item.price ?? 0,
 				items: [item],
 			});
 		}

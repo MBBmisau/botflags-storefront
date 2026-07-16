@@ -6,13 +6,20 @@ fragment Money on Money {
 fragment OrderLineFragment on OrderLine {
 	id
 	quantity
+	productSku
+	productVariantId
 	variant {
+		id
+		sku
 		name
 		translation(languageCode: $languageCode) {
 			name
 		}
 		product {
 			name
+			category {
+				name
+			}
 			translation(languageCode: $languageCode) {
 				name
 			}
@@ -34,11 +41,17 @@ fragment OrderLineFragment on OrderLine {
 		}
 	}
 	undiscountedUnitPrice {
+		net {
+			...Money
+		}
 		gross {
 			...Money
 		}
 	}
 	unitPrice {
+		net {
+			...Money
+		}
 		gross {
 			...Money
 		}

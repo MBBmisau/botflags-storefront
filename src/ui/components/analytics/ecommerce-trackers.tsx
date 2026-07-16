@@ -7,6 +7,9 @@ import {
 	cartValue,
 	claimPurchase,
 	commerceLineToAnalyticsItem,
+	productCardToAnalyticsItem,
+	promotionPayload,
+	type AnalyticsPromotion,
 	type CommerceLine,
 } from "@/lib/analytics/ecommerce";
 import type { AnalyticsEventName, AnalyticsEventPayloads, AnalyticsItem } from "@/lib/analytics/types";
@@ -15,6 +18,7 @@ function useTrackWhenReady<Name extends AnalyticsEventName>(
 	name: Name,
 	payload: AnalyticsEventPayloads[Name],
 	dedupeKey: string,
+	enabled = true,
 ) {
 	const payloadRef = useRef(payload);
 	useEffect(() => {
@@ -24,28 +28,14 @@ function useTrackWhenReady<Name extends AnalyticsEventName>(
 	useEffect(() => {
 		let sent = false;
 		const send = () => {
-			if (sent || !canTrackAnalytics()) return;
+			if (sent || !enabled || !canTrackAnalytics()) return;
 			trackEvent(name, payloadRef.current);
 			sent = true;
 		};
 		send();
 		window.addEventListener(ANALYTICS_READY_EVENT, send);
 		return () => window.removeEventListener(ANALYTICS_READY_EVENT, send);
-	}, [dedupeKey, name]);
-}
-
-export function productCardToAnalyticsItem(product: {
-	id: string;
-	name: string;
-	price: number;
-	category?: { name: string } | null;
-}): AnalyticsItem {
-	return {
-		item_id: product.id,
-		item_name: product.name,
-		price: product.price,
-		item_category: product.category?.name,
-	};
+	}, [dedupeKey, enabled, name]);
 }
 
 export function ViewItemListTracker({
@@ -57,6 +47,9 @@ export function ViewItemListTracker({
 		id: string;
 		name: string;
 		price: number;
+		analyticsPrice?: number;
+		analyticsCompareAtPrice?: number | null;
+		analyticsItemId?: string;
 		currency: string;
 		category?: { name: string } | null;
 	}>;
@@ -74,17 +67,26 @@ export function ViewItemListTracker({
 		"view_item_list",
 		{ currency, value: 0, items },
 		`${listId}:${items.map((item) => item.item_id).join(",")}`,
+		items.length > 0,
 	);
 	return null;
 }
 
-export function ViewItemTracker({ item, currency }: { item: AnalyticsItem; currency: string }) {
-	useTrackWhenReady("view_item", { currency, value: item.price, items: [item] }, item.item_id);
+export function ViewItemTracker({
+	item,
+	currency,
+	dedupeKey = item.item_id,
+}: {
+	item: AnalyticsItem;
+	currency: string;
+	dedupeKey?: string;
+}) {
+	useTrackWhenReady("view_item", { currency, value: item.price ?? 0, items: [item] }, dedupeKey);
 	return null;
 }
 
 export function SearchTracker({ searchTerm }: { searchTerm: string }) {
-	useTrackWhenReady("search", { currency: "NGN", value: 0, items: [], search_term: searchTerm }, searchTerm);
+	useTrackWhenReady("search", { search_term: searchTerm }, searchTerm, searchTerm.trim().length > 0);
 	return null;
 }
 
@@ -99,12 +101,12 @@ export function ViewCartTracker({ lines }: { lines: CommerceLine[] }) {
 	return null;
 }
 
-export function CheckoutTracker({ lines }: { lines: CommerceLine[] }) {
+export function CheckoutTracker({ lines, coupon }: { lines: CommerceLine[]; coupon?: string | null }) {
 	const currency = lines[0]?.totalPrice.gross.currency ?? "NGN";
 	const items = lines.map(commerceLineToAnalyticsItem);
 	useTrackWhenReady(
 		"begin_checkout",
-		{ currency, value: cartValue(lines), items },
+		{ currency, value: cartValue(lines), coupon: coupon || undefined, items },
 		items.map((item) => item.item_id).join(","),
 	);
 	return null;
@@ -121,9 +123,16 @@ export type PurchaseTrackerProps = {
 };
 
 export function PurchaseTracker(props: PurchaseTrackerProps) {
+	const attemptedRef = useRef(false);
 	useEffect(() => {
 		const send = () => {
-			if (!canTrackAnalytics() || !claimPurchase(props.transactionId, window.localStorage)) return;
+			if (
+				attemptedRef.current ||
+				!canTrackAnalytics() ||
+				!claimPurchase(props.transactionId, window.localStorage)
+			)
+				return;
+			attemptedRef.current = true;
 			trackEvent("purchase", {
 				transaction_id: props.transactionId,
 				currency: props.currency,
@@ -138,5 +147,14 @@ export function PurchaseTracker(props: PurchaseTrackerProps) {
 		window.addEventListener(ANALYTICS_READY_EVENT, send);
 		return () => window.removeEventListener(ANALYTICS_READY_EVENT, send);
 	}, [props]);
+	return null;
+}
+
+export function PromotionViewTracker({ promotion }: { promotion: AnalyticsPromotion }) {
+	useTrackWhenReady(
+		"view_promotion",
+		promotionPayload(promotion),
+		`${promotion.creativeSlot}:${promotion.id}`,
+	);
 	return null;
 }

@@ -26,6 +26,11 @@ export function sanitizePathname(pathname: string): string {
 	return path.startsWith("/") ? path : `/${path}`;
 }
 
+export function isAnalyticsDebugMode(search: string, environmentDebug = false): boolean {
+	if (environmentDebug) return true;
+	return new URLSearchParams(search).get("debug_mode") === "true";
+}
+
 export function sanitizeAnalyticsValue(value: unknown): unknown {
 	if (Array.isArray(value)) return value.map(sanitizeAnalyticsValue);
 	if (value && typeof value === "object") {

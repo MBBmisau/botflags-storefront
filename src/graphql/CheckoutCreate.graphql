@@ -13,6 +13,7 @@ mutation CheckoutCreate($channel: String!, $languageCode: LanguageCodeEnum!) {
 					}
 				}
 				variant {
+					sku
 					product {
 						id
 						name
@@ -27,6 +28,10 @@ mutation CheckoutCreate($channel: String!, $languageCode: LanguageCodeEnum!) {
 					}
 					pricing {
 						price {
+							net {
+								amount
+								currency
+							}
 							gross {
 								amount
 								currency

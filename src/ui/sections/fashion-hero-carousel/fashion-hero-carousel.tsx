@@ -12,16 +12,38 @@ import {
 	CarouselItem,
 	CarouselNext,
 	CarouselPrevious,
+	useCarousel,
 } from "@/ui/components/ui/carousel";
+import { PromotionViewTracker } from "@/ui/components/analytics/ecommerce-trackers";
+import { promotionPayload, type AnalyticsPromotion } from "@/lib/analytics/ecommerce";
+import { trackEvent } from "@/lib/analytics/gtag";
 
-export function FashionHeroCarousel({ slides }: { slides: readonly HomepageHeroSlideContent[] }) {
+function VisiblePromotionTracker({ promotions }: { promotions: readonly AnalyticsPromotion[] }) {
+	const { selectedIndex } = useCarousel();
+	const promotion = promotions[selectedIndex];
+
+	return promotion ? <PromotionViewTracker promotion={promotion} /> : null;
+}
+
+export function FashionHeroCarousel({
+	slides,
+	promotions,
+}: {
+	slides: readonly HomepageHeroSlideContent[];
+	promotions: readonly AnalyticsPromotion[];
+}) {
 	if (slides.length === 0) return null;
+	const trackSelection = (promotion: AnalyticsPromotion | undefined) => {
+		if (promotion) trackEvent("select_promotion", promotionPayload(promotion));
+	};
 
 	return (
 		<Carousel opts={{ loop: true }} aria-label="Botflags featured collections">
+			<VisiblePromotionTracker promotions={promotions} />
 			<CarouselContent className="ml-0" viewportClassName="bg-foreground">
 				{slides.map((slide, index) => {
 					const headingId = `fashion-hero-${slide.id}`;
+					const promotion = promotions[index];
 					return (
 						<CarouselItem key={slide.id} className="pl-0">
 							<section
@@ -58,6 +80,7 @@ export function FashionHeroCarousel({ slides }: { slides: readonly HomepageHeroS
 											<NavHrefLink
 												href={slide.primaryCtaHref}
 												className={buttonClassName({ asLink: true, size: "lg" })}
+												onClick={() => trackSelection(promotion)}
 											>
 												{slide.primaryCtaLabel}
 											</NavHrefLink>
@@ -71,6 +94,7 @@ export function FashionHeroCarousel({ slides }: { slides: readonly HomepageHeroS
 														className:
 															"border-background/40 bg-background/10 text-background hover:bg-background/20",
 													})}
+													onClick={() => trackSelection(promotion)}
 												>
 													{slide.secondaryCtaLabel}
 												</NavHrefLink>

@@ -16,6 +16,8 @@ export const productGridDesktopClassName: Record<ProductGridDesktopColumns, stri
 type ProductGridProps = {
 	desktopColumns?: ProductGridDesktopColumns;
 	imageSizes?: string;
+	listId?: string;
+	listName?: string;
 } & (
 	| {
 			locale: string;
@@ -31,14 +33,18 @@ function ProductGridInner({
 	products,
 	imageSizes = PLP_IMAGE_SIZES,
 	desktopColumns = 3,
+	listId = "product-grid",
+	listName = "Product grid",
 }: {
 	products: ProductCardData[];
 	imageSizes?: string;
 	desktopColumns?: ProductGridDesktopColumns;
+	listId?: string;
+	listName?: string;
 }) {
 	return (
 		<>
-			<ViewItemListTracker products={products} />
+			<ViewItemListTracker products={products} listId={listId} listName={listName} />
 			<div
 				className={cn("grid w-full grid-cols-2 gap-4 lg:gap-6", productGridDesktopClassName[desktopColumns])}
 				data-testid="ProductList"
@@ -49,6 +55,9 @@ function ProductGridInner({
 						product={product}
 						priority={index < LCP_IMAGE_PRIORITY_COUNT}
 						imageSizes={imageSizes}
+						listId={listId}
+						listName={listName}
+						index={index}
 					/>
 				))}
 			</div>
@@ -57,14 +66,28 @@ function ProductGridInner({
 }
 
 export function ProductGrid(props: ProductGridProps) {
-	const { imageSizes = PLP_IMAGE_SIZES, desktopColumns = 3 } = props;
+	const { imageSizes = PLP_IMAGE_SIZES, desktopColumns = 3, listId, listName } = props;
 
 	if ("channel" in props) {
 		const cards = props.products.map((product) => toProductCardData(product, props.locale, props.channel));
-		return <ProductGridInner products={cards} imageSizes={imageSizes} desktopColumns={desktopColumns} />;
+		return (
+			<ProductGridInner
+				products={cards}
+				imageSizes={imageSizes}
+				desktopColumns={desktopColumns}
+				listId={listId}
+				listName={listName}
+			/>
+		);
 	}
 
 	return (
-		<ProductGridInner products={props.products} imageSizes={imageSizes} desktopColumns={desktopColumns} />
+		<ProductGridInner
+			products={props.products}
+			imageSizes={imageSizes}
+			desktopColumns={desktopColumns}
+			listId={listId}
+			listName={listName}
+		/>
 	);
 }

@@ -18,6 +18,8 @@ import { StickyBar } from "./sticky-bar";
 import { Badge } from "@/ui/components/ui/badge";
 import { SaleBadge } from "@/ui/components/ui/sale-label";
 import { resolveSelectedVariantId, type Product } from "./gallery-utils";
+import { ViewItemTracker } from "@/ui/components/analytics/ecommerce-trackers";
+import { ANALYTICS_AFFILIATION, ANALYTICS_BRAND, positiveDiscount } from "@/lib/analytics/ecommerce";
 
 interface VariantSectionDynamicProps {
 	product: Product;
@@ -102,6 +104,27 @@ export async function VariantSectionDynamic({
 				)}`
 			: null;
 	const secureCheckoutLabel = content.surfaces.checkout.trust.secureCheckout;
+	const analyticsPrice =
+		selectedVariant?.pricing?.price?.net.amount ??
+		product.pricing?.priceRange?.start?.net.amount ??
+		currentPrice ??
+		0;
+	const analyticsUndiscountedPrice = selectedVariant?.pricing?.priceUndiscounted?.net.amount;
+	const analyticsCurrency =
+		selectedVariant?.pricing?.price?.net.currency ??
+		product.pricing?.priceRange?.start?.net.currency ??
+		currency;
+	const analyticsItem = {
+		item_id: selectedVariant?.sku || selectedVariant?.id || product.id,
+		item_name: product.name,
+		item_variant: selectedVariant?.name || selectedVariant?.id,
+		item_category: product.category?.name,
+		item_brand: ANALYTICS_BRAND,
+		affiliation: ANALYTICS_AFFILIATION,
+		price: analyticsPrice,
+		discount: positiveDiscount(analyticsUndiscountedPrice, analyticsPrice),
+		quantity: 1,
+	};
 
 	// Server action for adding to cart
 	async function addToCart() {
@@ -151,6 +174,7 @@ export async function VariantSectionDynamic({
 
 	return (
 		<>
+			<ViewItemTracker currency={analyticsCurrency} item={analyticsItem} dedupeKey={product.id} />
 			{/* Category + Sale/Stock badges row - order:1 so it appears ABOVE the h1 */}
 			<div className="order-1 flex items-center gap-2">
 				{product.category && <span className="text-sm text-muted-foreground">{product.category.name}</span>}
@@ -181,14 +205,8 @@ export async function VariantSectionDynamic({
 					disabledReason={disabledReason}
 					secureCheckoutLabel={secureCheckoutLabel}
 					freeShippingTrustLabel={freeShippingTrustLabel}
-					analyticsCurrency={selectedVariant?.pricing?.price?.gross?.currency ?? currency}
-					analyticsItem={{
-						item_id: product.id,
-						item_name: product.name,
-						item_variant: selectedVariant?.name || selectedVariant?.id,
-						item_category: product.category?.name,
-						price: selectedVariant?.pricing?.price?.gross?.amount ?? currentPrice ?? 0,
-					}}
+					analyticsCurrency={analyticsCurrency}
+					analyticsItem={analyticsItem}
 				/>
 
 				{/* Sticky Add to Cart Bar (Mobile) */}

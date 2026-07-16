@@ -60,7 +60,7 @@ export const SaleorCheckout: FC = () => {
 
 	return (
 		<>
-			<CheckoutTracker lines={checkout.lines} />
+			<CheckoutTracker lines={checkout.lines} coupon={checkout.voucherCode} />
 			<CheckoutPageShell
 				step={currentStep.index}
 				onStepClick={

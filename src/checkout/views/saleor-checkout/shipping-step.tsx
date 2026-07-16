@@ -58,10 +58,11 @@ export const ShippingStep: FC<ShippingStepProps> = ({
 		trackEvent("add_shipping_info", {
 			currency,
 			value: cartValue(checkout.lines),
+			coupon: checkout.voucherCode || undefined,
 			shipping_tier: shippingMethod?.name || "Nigeria delivery",
 			items: checkout.lines.map(commerceLineToAnalyticsItem),
 		});
-	}, [checkout.lines, checkout.totalPrice.gross.currency, deliveries, selectedMethod]);
+	}, [checkout.lines, checkout.totalPrice.gross.currency, checkout.voucherCode, deliveries, selectedMethod]);
 
 	const showInvalidWarning =
 		hasDeliveryProblem(checkout, "CheckoutProblemDeliveryMethodInvalid") &&

@@ -14,6 +14,8 @@ import { ImageWithText } from "@/ui/sections/image-with-text/image-with-text";
 import { MediaHero } from "@/ui/sections/media-hero/media-hero";
 import { MulticolumnSection } from "@/ui/sections/multicolumn-section/multicolumn-section";
 import { RichTextBlock } from "@/ui/sections/rich-text-block/rich-text-block";
+import { toProductCardData } from "@/ui/components/plp/utils";
+import { productCardToAnalyticsItem } from "@/lib/analytics/ecommerce";
 
 export const metadata = {
 	description: brandConfig.description,
@@ -101,11 +103,30 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 		...column,
 		text: formatContentLabel(column.text, policyValues),
 	}));
+	const heroPromotions =
+		hero.slides?.map((slide, index) => {
+			const promotedProduct = products[index] ?? products[0];
+			const item = promotedProduct
+				? productCardToAnalyticsItem(toProductCardData(promotedProduct, locale, channel))
+				: {
+						item_id: `promotion-${slide.id}`,
+						item_name: slide.heading,
+						item_brand: "Botflags",
+						affiliation: "Botflags Online Store",
+					};
+			return {
+				id: slide.id,
+				name: slide.heading,
+				creativeName: slide.image,
+				creativeSlot: `homepage_hero_${index + 1}`,
+				item,
+			};
+		}) ?? [];
 
 	return (
 		<>
 			{hero.slides?.length ? (
-				<FashionHeroCarousel slides={hero.slides} />
+				<FashionHeroCarousel slides={hero.slides} promotions={heroPromotions} />
 			) : hero.backgroundImage ? (
 				// Art-directed full-bleed media → immersive overlay hero.
 				<MediaHero

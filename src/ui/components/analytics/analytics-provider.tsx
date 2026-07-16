@@ -9,7 +9,12 @@ import {
 	parseConsentCookie,
 	serializeConsentCookie,
 } from "@/lib/analytics/consent";
-import { initializeConsentDefaults, trackPageView, updateAnalyticsConsent } from "@/lib/analytics/gtag";
+import {
+	initializeConsentDefaults,
+	isAnalyticsDebugMode,
+	trackPageView,
+	updateAnalyticsConsent,
+} from "@/lib/analytics/gtag";
 import type { AnalyticsConsent } from "@/lib/analytics/types";
 import { AnalyticsConsentBanner } from "./analytics-consent-banner";
 
@@ -67,7 +72,10 @@ export function AnalyticsProvider({ privacyHref }: { privacyHref: string }) {
 							send_page_view: false,
 							allow_google_signals: false,
 							allow_ad_personalization_signals: false,
-							debug_mode: process.env.NEXT_PUBLIC_GA_DEBUG === "true",
+							debug_mode: isAnalyticsDebugMode(
+								window.location.search,
+								process.env.NEXT_PUBLIC_GA_DEBUG === "true",
+							),
 						});
 						setTagReady(true);
 						window.dispatchEvent(new Event(ANALYTICS_READY_EVENT));

@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { sanitizeAnalyticsValue, sanitizePathname, trackEvent, updateAnalyticsConsent } from "./gtag";
+import {
+	isAnalyticsDebugMode,
+	sanitizeAnalyticsValue,
+	sanitizePathname,
+	trackEvent,
+	updateAnalyticsConsent,
+} from "./gtag";
 
 afterEach(() => {
 	updateAnalyticsConsent("denied");
@@ -12,6 +18,12 @@ describe("analytics data safety", () => {
 		expect(sanitizePathname("en/nigeria-ngn/products/dress?variant=123")).toBe(
 			"/en/nigeria-ngn/products/dress",
 		);
+	});
+
+	it("enables DebugView through an explicit query flag without including it in page paths", () => {
+		expect(isAnalyticsDebugMode("?debug_mode=true")).toBe(true);
+		expect(isAnalyticsDebugMode("?debug_mode=false")).toBe(false);
+		expect(isAnalyticsDebugMode("", true)).toBe(true);
 	});
 
 	it("removes blocked PII fields and redacts accidental email strings", () => {
@@ -48,5 +60,14 @@ describe("analytics data safety", () => {
 		updateAnalyticsConsent("granted");
 		trackEvent("view_item", payload);
 		expect(calls.at(-1)).toEqual(["event", "view_item", payload]);
+
+		trackEvent("search", { search_term: "black dress" });
+		trackEvent("login", { method: "email" });
+		trackEvent("sign_up", { method: "email" });
+		expect(calls.slice(-3)).toEqual([
+			["event", "search", { search_term: "black dress" }],
+			["event", "login", { method: "email" }],
+			["event", "sign_up", { method: "email" }],
+		]);
 	});
 });

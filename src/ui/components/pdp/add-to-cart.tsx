@@ -69,7 +69,7 @@ export function AddToCart({
 				if (disabled || !(event.target as HTMLElement).closest('button[type="submit"]')) return;
 				trackEvent("add_to_cart", {
 					currency: analyticsCurrency,
-					value: analyticsItem.price,
+					value: analyticsItem.price ?? 0,
 					items: [{ ...analyticsItem, quantity: 1 }],
 				});
 			}}

@@ -10,6 +10,7 @@ import { buildStorefrontPath } from "@/lib/storefront-path";
 import { Button } from "@/ui/components/ui/button";
 import { Input } from "@/ui/components/ui/input";
 import { Label } from "@/ui/components/ui/label";
+import { trackEvent } from "@/lib/analytics/gtag";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -64,6 +65,7 @@ export function LoginMode() {
 			}
 
 			if (result.ok) {
+				trackEvent("login", { method: "email" });
 				await syncAuthSurfacesAfterSignIn(params.channel, router, {
 					redirectTo: buildStorefrontPath(params.locale, params.channel),
 				});
@@ -138,7 +140,7 @@ export function LoginMode() {
 
 				<form onSubmit={handleLogin} className="space-y-4">
 					{error && (
-						<div role="alert" className="bg-destructive/10 rounded-md p-3 text-sm text-destructive">
+						<div role="alert" className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
 							{error}
 						</div>
 					)}

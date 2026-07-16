@@ -13,6 +13,7 @@ import { PageNotFound } from "@/checkout/views/page-not-found";
 import { useTranslations } from "next-intl";
 import { getLocaleDefinition } from "@/config/locale";
 import { PurchaseTracker } from "@/ui/components/analytics/ecommerce-trackers";
+import { itemsValue, orderLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
 
 /** Format address for display */
 function formatAddress(address: {
@@ -62,24 +63,21 @@ export const OrderConfirmation = () => {
 	const shippingAddress = order.shippingAddress;
 	const billingAddress = order.billingAddress;
 	const email = order.userEmail || "";
+	const purchaseItems = order.lines.map(orderLineToAnalyticsItem);
 
 	return (
 		<OrderConfirmationPageShell storefrontChannel={channel}>
-			<PurchaseTracker
-				transactionId={order.number}
-				currency={order.total.gross.currency}
-				value={order.total.gross.amount}
-				tax={order.total.tax.amount}
-				shipping={order.shippingPrice.gross.amount}
-				coupon={order.voucher?.code ?? undefined}
-				items={order.lines.map((line) => ({
-					item_id: line.id,
-					item_name: line.productName,
-					item_variant: line.variantName || line.variant?.name || undefined,
-					price: line.unitPrice.gross.amount,
-					quantity: line.quantity,
-				}))}
-			/>
+			{order.isPaid ? (
+				<PurchaseTracker
+					transactionId={order.number}
+					currency={order.total.gross.currency}
+					value={itemsValue(purchaseItems)}
+					tax={order.total.tax.amount}
+					shipping={order.shippingPrice.gross.amount}
+					coupon={order.voucher?.code ?? undefined}
+					items={purchaseItems}
+				/>
+			) : null}
 			<main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 				<div className="flex flex-col gap-8 md:flex-row">
 					<div className="order-2 min-w-0 flex-1 md:order-1">

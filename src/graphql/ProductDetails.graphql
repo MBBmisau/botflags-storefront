@@ -64,6 +64,10 @@ query ProductDetails($slug: String!, $channel: String!, $languageCode: LanguageC
 		pricing {
 			priceRange {
 				start {
+					net {
+						amount
+						currency
+					}
 					gross {
 						amount
 						currency

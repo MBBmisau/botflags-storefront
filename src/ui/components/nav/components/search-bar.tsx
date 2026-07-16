@@ -1,6 +1,9 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 import { buildStorefrontPath } from "@/lib/storefront-path";
+import { trackEvent } from "@/lib/analytics/gtag";
 
 export const SearchBar = ({
 	locale,
@@ -13,16 +16,17 @@ export const SearchBar = ({
 	placeholder: string;
 	srOnlyLabel: string;
 }) => {
-	async function onSubmit(formData: FormData) {
-		"use server";
-		const search = formData.get("search") as string;
-		if (search && search.trim().length > 0) {
-			redirect(`${buildStorefrontPath(locale, channel, "/search")}?query=${encodeURIComponent(search)}`);
-		}
-	}
+	const router = useRouter();
+	const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		const search = new FormData(event.currentTarget).get("search")?.toString().trim() ?? "";
+		if (!search) return;
+		trackEvent("search", { search_term: search });
+		router.push(`${buildStorefrontPath(locale, channel, "/search")}?query=${encodeURIComponent(search)}`);
+	};
 
 	return (
-		<form action={onSubmit} className="group relative w-full max-w-md">
+		<form onSubmit={onSubmit} className="group relative w-full max-w-md">
 			<label className="relative block">
 				<span className="sr-only">{srOnlyLabel}</span>
 				{/* Search icon */}
@@ -39,7 +43,7 @@ export const SearchBar = ({
 					placeholder={placeholder}
 					autoComplete="off"
 					required
-					className="hover:bg-secondary/80 focus:outline-hidden h-10 w-full rounded-lg border border-transparent bg-secondary py-2 pl-11 pr-4 text-sm text-foreground transition-all placeholder:text-muted-foreground hover:border-border focus:border-ring focus:bg-background focus:ring-1 focus:ring-ring"
+					className="focus:outline-hidden h-10 w-full rounded-lg border border-transparent bg-secondary py-2 pl-11 pr-4 text-sm text-foreground transition-all placeholder:text-muted-foreground hover:border-border hover:bg-secondary/80 focus:border-ring focus:bg-background focus:ring-1 focus:ring-ring"
 				/>
 			</label>
 		</form>

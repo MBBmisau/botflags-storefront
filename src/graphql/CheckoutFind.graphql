@@ -12,6 +12,7 @@ query CheckoutFind($id: ID!, $languageCode: LanguageCodeEnum!) {
 				}
 			}
 			variant {
+				sku
 				translation(languageCode: $languageCode) {
 					name
 				}
@@ -35,12 +36,20 @@ query CheckoutFind($id: ID!, $languageCode: LanguageCodeEnum!) {
 				}
 				pricing {
 					price {
+						net {
+							amount
+							currency
+						}
 						gross {
 							amount
 							currency
 						}
 					}
 					priceUndiscounted {
+						net {
+							amount
+							currency
+						}
 						gross {
 							amount
 							currency

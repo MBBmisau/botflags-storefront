@@ -5,6 +5,10 @@ export interface ProductCardData {
 	slug: string;
 	brand?: string | null;
 	price: number;
+	/** Discounted net price and stable SKU/variant identifier used only for GA4. */
+	analyticsPrice?: number;
+	analyticsCompareAtPrice?: number | null;
+	analyticsItemId?: string;
 	/** Upper bound when variant prices differ; omit when same as `price`. */
 	priceStop?: number | null;
 	compareAtPrice?: number | null;

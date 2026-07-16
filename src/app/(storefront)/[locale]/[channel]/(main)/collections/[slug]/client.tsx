@@ -65,7 +65,11 @@ export function CollectionPageClient({ products, pageInfo }: CollectionPageClien
 			<div className="w-full">
 				<div className="container-content py-8">
 					{filteredProducts.length > 0 ? (
-						<ProductGrid products={filteredProducts} />
+						<ProductGrid
+							products={filteredProducts}
+							listId="collection-products"
+							listName="Collection products"
+						/>
 					) : (
 						<div className="py-12 text-center">
 							<p className="text-lg text-muted-foreground">No products match your filters.</p>

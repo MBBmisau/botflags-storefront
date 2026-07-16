@@ -59,6 +59,8 @@ export async function FeaturedCollectionSection({
 					products={products}
 					imageSizes={FEATURED_COLLECTION_IMAGE_SIZES}
 					desktopColumns={desktopColumns}
+					listId={`featured-${collectionSlug}`}
+					listName={heading || "Featured products"}
 				/>
 			) : (
 				<p className="text-muted-foreground">

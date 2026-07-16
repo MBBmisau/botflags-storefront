@@ -114,6 +114,9 @@ fragment CheckoutLineFragment on CheckoutLine {
 		}
 	}
 	unitPrice {
+		net {
+			...Money
+		}
 		gross {
 			...Money
 		}
@@ -122,6 +125,7 @@ fragment CheckoutLineFragment on CheckoutLine {
 		...Money
 	}
 	variant {
+		sku
 		attributes(variantSelection: ALL) {
 			values {
 				name
@@ -138,7 +142,11 @@ fragment CheckoutLineFragment on CheckoutLine {
 			name
 		}
 		product {
+			id
 			name
+			category {
+				name
+			}
 			translation(languageCode: $languageCode) {
 				language {
 					code
