@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ProductCard } from "./product-card";
 import type { ProductCardData } from "./product-card-data";
 import { toProductCardData } from "./utils";
+import { ViewItemListTracker } from "@/ui/components/analytics/ecommerce-trackers";
 
 export type ProductGridDesktopColumns = 3 | 4;
 
@@ -36,19 +37,22 @@ function ProductGridInner({
 	desktopColumns?: ProductGridDesktopColumns;
 }) {
 	return (
-		<div
-			className={cn("grid w-full grid-cols-2 gap-4 lg:gap-6", productGridDesktopClassName[desktopColumns])}
-			data-testid="ProductList"
-		>
-			{products.map((product, index) => (
-				<ProductCard
-					key={product.id}
-					product={product}
-					priority={index < LCP_IMAGE_PRIORITY_COUNT}
-					imageSizes={imageSizes}
-				/>
-			))}
-		</div>
+		<>
+			<ViewItemListTracker products={products} />
+			<div
+				className={cn("grid w-full grid-cols-2 gap-4 lg:gap-6", productGridDesktopClassName[desktopColumns])}
+				data-testid="ProductList"
+			>
+				{products.map((product, index) => (
+					<ProductCard
+						key={product.id}
+						product={product}
+						priority={index < LCP_IMAGE_PRIORITY_COUNT}
+						imageSizes={imageSizes}
+					/>
+				))}
+			</div>
+		</>
 	);
 }
 

@@ -30,6 +30,8 @@ import { storePaystackTransactionId } from "@/checkout/lib/payment/paystack-tran
 import { updateCheckoutBilling } from "@/checkout/lib/payment/update-billing";
 import { Button } from "@/ui/components/ui/button";
 import { LoadingSpinner } from "@/checkout/ui-kit/loading-spinner";
+import { commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
+import { trackEvent } from "@/lib/analytics/gtag";
 
 type PaystackBillingContext = {
 	billingData: BillingAddressData;
@@ -107,6 +109,13 @@ export const PaystackPayment: FC<PaystackPaymentProps> = ({
 				onPriceChangeNotice(buildCheckoutPriceChangeNotice(displayedAmount, amount, currency));
 				return;
 			}
+
+			trackEvent("add_payment_info", {
+				currency,
+				value: amount,
+				payment_type: "Paystack",
+				items: liveCheckout.lines.map(commerceLineToAnalyticsItem),
+			});
 
 			const result = await getCheckoutTransport().initializeTransaction({
 				checkoutId: liveCheckout.id,

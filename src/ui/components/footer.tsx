@@ -16,6 +16,7 @@ import { CopyrightText } from "./copyright-text";
 import { FooterPhotoCredits } from "./footer-photo-credits";
 import { brandConfig } from "@/config/brand";
 import { Logo } from "./shared/logo";
+import { AnalyticsPreferencesButton } from "./analytics/analytics-preferences-button";
 
 import { buildStorefrontPath } from "@/lib/storefront-path";
 
@@ -83,6 +84,7 @@ export async function Footer({ locale, channel }: { locale: string; channel: str
 						<FooterPhotoCredits credits={content.surfaces.homepage.photoCredits} />
 					</div>
 					<div className="flex items-center gap-6">
+						<AnalyticsPreferencesButton inverted />
 						<Link
 							href={buildStorefrontPath(locale, channel, "/privacy")}
 							prefetch={false}

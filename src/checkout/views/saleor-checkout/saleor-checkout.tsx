@@ -17,6 +17,7 @@ import { PaymentStep } from "./payment-step";
 import { useCheckoutTransition } from "@/checkout/hooks/use-checkout-transition";
 import { CheckoutSkeleton } from "./checkout-skeleton";
 import { PaymentCompletingScreen } from "./payment-completing-screen";
+import { CheckoutTracker } from "@/ui/components/analytics/ecommerce-trackers";
 
 export const SaleorCheckout: FC = () => {
 	const searchParams = useSearchParams();
@@ -58,63 +59,66 @@ export const SaleorCheckout: FC = () => {
 	}
 
 	return (
-		<CheckoutPageShell
-			step={currentStep.index}
-			onStepClick={
-				isCheckoutNavigationLocked
-					? undefined
-					: (stepIndex) => {
-							const step = checkoutSteps.find((s) => s.index === stepIndex);
-							if (step) goToStep(step.id);
-						}
-			}
-			isShippingRequired={isShippingRequired}
-			storefrontChannel={checkout.channel.slug}
-		>
-			<main className="mx-auto max-w-7xl px-4 py-6 pb-24 sm:px-6 md:py-8 md:pb-8 lg:px-8">
-				<div className="flex flex-col gap-8 md:flex-row">
-					<div className="min-w-0 flex-1">
-						<div className="mb-4 overflow-hidden rounded-lg border border-border bg-card md:hidden">
-							<OrderSummary checkout={checkout} onCheckoutChange={() => void refetch()} />
+		<>
+			<CheckoutTracker lines={checkout.lines} />
+			<CheckoutPageShell
+				step={currentStep.index}
+				onStepClick={
+					isCheckoutNavigationLocked
+						? undefined
+						: (stepIndex) => {
+								const step = checkoutSteps.find((s) => s.index === stepIndex);
+								if (step) goToStep(step.id);
+							}
+				}
+				isShippingRequired={isShippingRequired}
+				storefrontChannel={checkout.channel.slug}
+			>
+				<main className="mx-auto max-w-7xl px-4 py-6 pb-24 sm:px-6 md:py-8 md:pb-8 lg:px-8">
+					<div className="flex flex-col gap-8 md:flex-row">
+						<div className="min-w-0 flex-1">
+							<div className="mb-4 overflow-hidden rounded-lg border border-border bg-card md:hidden">
+								<OrderSummary checkout={checkout} onCheckoutChange={() => void refetch()} />
+							</div>
+							<div className="rounded-lg border border-border bg-card p-6 md:p-8">
+								<div ref={stepRef} tabIndex={-1} className="outline-none">
+									{currentStep.id === "INFO" ? (
+										<InformationStep
+											checkout={checkout}
+											onComplete={(updated) =>
+												completeStep(updated, updated.isShippingRequired ? "SHIPPING" : "PAYMENT")
+											}
+										/>
+									) : null}
+									{currentStep.id === "SHIPPING" ? (
+										<ShippingStep
+											checkout={checkout}
+											deliveries={shippingDeliveries}
+											isLoadingDeliveries={isLoadingShippingDeliveries}
+											onBack={() => goToStep("INFO")}
+											onComplete={(updated) => completeStep(updated, "PAYMENT")}
+										/>
+									) : null}
+									{currentStep.id === "PAYMENT" ? (
+										<PaymentStep
+											checkout={checkout}
+											onBack={() => goToStep(isShippingRequired ? "SHIPPING" : "INFO")}
+											onGoToInformation={() => goToStep("INFO")}
+											onPaymentBusyChange={setIsPaymentBusy}
+										/>
+									) : null}
+								</div>
+							</div>
 						</div>
-						<div className="rounded-lg border border-border bg-card p-6 md:p-8">
-							<div ref={stepRef} tabIndex={-1} className="outline-none">
-								{currentStep.id === "INFO" ? (
-									<InformationStep
-										checkout={checkout}
-										onComplete={(updated) =>
-											completeStep(updated, updated.isShippingRequired ? "SHIPPING" : "PAYMENT")
-										}
-									/>
-								) : null}
-								{currentStep.id === "SHIPPING" ? (
-									<ShippingStep
-										checkout={checkout}
-										deliveries={shippingDeliveries}
-										isLoadingDeliveries={isLoadingShippingDeliveries}
-										onBack={() => goToStep("INFO")}
-										onComplete={(updated) => completeStep(updated, "PAYMENT")}
-									/>
-								) : null}
-								{currentStep.id === "PAYMENT" ? (
-									<PaymentStep
-										checkout={checkout}
-										onBack={() => goToStep(isShippingRequired ? "SHIPPING" : "INFO")}
-										onGoToInformation={() => goToStep("INFO")}
-										onPaymentBusyChange={setIsPaymentBusy}
-									/>
-								) : null}
+
+						<div className="hidden md:block md:shrink-0 md:basis-[30%]">
+							<div className="overflow-hidden rounded-lg border border-border bg-card md:sticky md:top-8">
+								<OrderSummary checkout={checkout} onCheckoutChange={() => void refetch()} />
 							</div>
 						</div>
 					</div>
-
-					<div className="hidden md:block md:shrink-0 md:basis-[30%]">
-						<div className="overflow-hidden rounded-lg border border-border bg-card md:sticky md:top-8">
-							<OrderSummary checkout={checkout} onCheckoutChange={() => void refetch()} />
-						</div>
-					</div>
-				</div>
-			</main>
-		</CheckoutPageShell>
+				</main>
+			</CheckoutPageShell>
+		</>
 	);
 };

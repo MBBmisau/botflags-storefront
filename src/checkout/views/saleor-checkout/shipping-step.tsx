@@ -18,6 +18,8 @@ import { formatShippingPrice } from "@/checkout/lib/utils/money";
 import { MobileStickyAction } from "./mobile-sticky-action";
 import { useCheckoutStepNumber } from "@/checkout/hooks/use-checkout-steps";
 import { useTranslations } from "next-intl";
+import { cartValue, commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
+import { trackEvent } from "@/lib/analytics/gtag";
 
 interface ShippingStepProps {
 	checkout: CheckoutFragment;
@@ -49,6 +51,17 @@ export const ShippingStep: FC<ShippingStepProps> = ({
 	const selectedMethod = resolveSelectedDeliveryId(userSelectedMethod, deliveries, savedDeliveryMethodId);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const trackShipping = useCallback(() => {
+		const selectedDelivery = deliveries.find((delivery) => deliverySelectionId(delivery) === selectedMethod);
+		const shippingMethod = selectedDelivery?.shippingMethod;
+		const currency = checkout.totalPrice.gross.currency;
+		trackEvent("add_shipping_info", {
+			currency,
+			value: cartValue(checkout.lines),
+			shipping_tier: shippingMethod?.name || "Nigeria delivery",
+			items: checkout.lines.map(commerceLineToAnalyticsItem),
+		});
+	}, [checkout.lines, checkout.totalPrice.gross.currency, deliveries, selectedMethod]);
 
 	const showInvalidWarning =
 		hasDeliveryProblem(checkout, "CheckoutProblemDeliveryMethodInvalid") &&
@@ -78,16 +91,18 @@ export const ShippingStep: FC<ShippingStepProps> = ({
 						setIsSubmitting(false);
 						return;
 					}
+					trackShipping();
 					onComplete(result.checkout);
 					return;
 				}
 
+				trackShipping();
 				onComplete(checkout);
 			} catch {
 				setIsSubmitting(false);
 			}
 		},
-		[selectedMethod, savedDeliveryMethodId, onComplete, checkout, isSubmitting, t],
+		[selectedMethod, savedDeliveryMethodId, onComplete, checkout, isSubmitting, t, trackShipping],
 	);
 
 	const showSpinner = isLoadingDeliveries && !isSubmitting && deliveries.length === 0;

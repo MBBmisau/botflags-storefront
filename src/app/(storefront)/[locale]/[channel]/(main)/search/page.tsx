@@ -11,6 +11,7 @@ import { SearchIcon } from "lucide-react";
 import { buttonClassName } from "@/ui/components/ui/button";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { buildStorefrontPath } from "@/lib/storefront-path";
+import { SearchTracker } from "@/ui/components/analytics/ecommerce-trackers";
 
 /**
  * Search results are query-dependent and thin — keep them out of the index.
@@ -119,6 +120,7 @@ async function SearchContent({
 
 	return (
 		<div>
+			<SearchTracker searchTerm={query} />
 			{/* Header with count and sort */}
 			<div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div>

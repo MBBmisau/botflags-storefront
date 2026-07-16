@@ -6,6 +6,8 @@ import { ShoppingBag } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
 import { DiscountPercentLabel } from "@/ui/components/ui/sale-label";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics/gtag";
+import type { AnalyticsItem } from "@/lib/analytics/types";
 
 interface AddToCartProps {
 	price: string;
@@ -15,6 +17,8 @@ interface AddToCartProps {
 	disabledReason?: "no-selection" | "out-of-stock";
 	secureCheckoutLabel: string;
 	freeShippingTrustLabel?: string | null;
+	analyticsItem: AnalyticsItem;
+	analyticsCurrency: string;
 }
 
 function AddToCartButton({
@@ -55,9 +59,21 @@ export function AddToCart({
 	disabledReason,
 	secureCheckoutLabel,
 	freeShippingTrustLabel,
+	analyticsItem,
+	analyticsCurrency,
 }: AddToCartProps) {
 	return (
-		<div className="space-y-4">
+		<div
+			className="space-y-4"
+			onClick={(event) => {
+				if (disabled || !(event.target as HTMLElement).closest('button[type="submit"]')) return;
+				trackEvent("add_to_cart", {
+					currency: analyticsCurrency,
+					value: analyticsItem.price,
+					items: [{ ...analyticsItem, quantity: 1 }],
+				});
+			}}
+		>
 			<div className="flex items-baseline gap-3">
 				<span className="text-2xl font-semibold tabular-nums tracking-tight">{price}</span>
 				{compareAtPrice && (

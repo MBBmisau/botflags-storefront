@@ -13,6 +13,8 @@ import { buildBrowsePageMetadata } from "@/lib/seo";
 import { resolveLocaleFromSlug } from "@/config/locale";
 import { LinkWithChannel } from "@/ui/atoms/link-with-channel";
 import { buttonClassName } from "@/ui/components/ui/button";
+import { commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
+import { ViewCartTracker } from "@/ui/components/analytics/ecommerce-trackers";
 
 export async function generateMetadata(props: {
 	params: Promise<{ locale: string; channel: string }>;
@@ -71,6 +73,7 @@ async function CartContent({
 
 	return (
 		<>
+			<ViewCartTracker lines={checkout.lines} />
 			<h1 className="mt-8 text-balance text-h1 text-foreground">{t("title")}</h1>
 			<form className="mt-12">
 				<ul
@@ -119,6 +122,8 @@ async function CartContent({
 									<div className="text-sm font-bold">{t("quantity", { count: item.quantity })}</div>
 									<DeleteLineButton
 										deleteLine={deleteCartLine.bind(null, checkoutId, item.id, params.channel)}
+										currency={item.totalPrice.gross.currency}
+										item={commerceLineToAnalyticsItem(item)}
 									/>
 								</div>
 							</div>

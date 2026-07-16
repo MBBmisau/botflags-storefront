@@ -181,6 +181,14 @@ export async function VariantSectionDynamic({
 					disabledReason={disabledReason}
 					secureCheckoutLabel={secureCheckoutLabel}
 					freeShippingTrustLabel={freeShippingTrustLabel}
+					analyticsCurrency={selectedVariant?.pricing?.price?.gross?.currency ?? currency}
+					analyticsItem={{
+						item_id: product.id,
+						item_name: product.name,
+						item_variant: selectedVariant?.name || selectedVariant?.id,
+						item_category: product.category?.name,
+						price: selectedVariant?.pricing?.price?.gross?.amount ?? currentPrice ?? 0,
+					}}
 				/>
 
 				{/* Sticky Add to Cart Bar (Mobile) */}

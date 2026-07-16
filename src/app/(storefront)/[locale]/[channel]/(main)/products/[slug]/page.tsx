@@ -21,6 +21,7 @@ import { isBestseller, BESTSELLER_ATTRIBUTE_SLUGS } from "@/lib/catalog/product-
 import { getAttributeValueDisplayName } from "@/ui/components/pdp/variant-selection/utils";
 import { Breadcrumbs } from "@/ui/components/breadcrumbs";
 import { BestsellerBadge } from "@/ui/components/ui/sale-label";
+import { ViewItemTracker } from "@/ui/components/analytics/ecommerce-trackers";
 import {
 	ProductAttributes,
 	activeGalleryVariant,
@@ -204,6 +205,15 @@ async function ProductShell({
 
 	return (
 		<div className="flex min-h-screen flex-col bg-background">
+			<ViewItemTracker
+				currency={currency}
+				item={{
+					item_id: product.id,
+					item_name: product.name,
+					item_category: product.category?.name,
+					price: product.pricing?.priceRange?.start?.gross?.amount ?? 0,
+				}}
+			/>
 			{productJsonLd && <script {...jsonLdScriptProps(productJsonLd)} />}
 
 			{/* The browse layout (`(main)/layout.tsx`) owns the page's single <main> landmark. */}

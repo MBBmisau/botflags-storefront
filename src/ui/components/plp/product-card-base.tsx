@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -7,6 +9,8 @@ import { formatProductPrice } from "./format-product-price";
 import { formatPrice } from "./utils";
 import { PLP_IMAGE_SIZES, PRODUCT_IMAGE_QUALITY } from "@/lib/images";
 import type { ProductCardData } from "./product-card-data";
+import { productCardToAnalyticsItem } from "@/ui/components/analytics/ecommerce-trackers";
+import { trackEvent } from "@/lib/analytics/gtag";
 
 export interface ProductCardBaseProps {
 	product: ProductCardData;
@@ -22,6 +26,15 @@ export function ProductCardBase({
 	imageSizes = PLP_IMAGE_SIZES,
 	imageOverlay,
 }: ProductCardBaseProps) {
+	const trackSelection = () => {
+		const item = {
+			...productCardToAnalyticsItem(product),
+			item_list_id: "product-grid",
+			item_list_name: "Product grid",
+		};
+		trackEvent("select_item", { currency: product.currency, value: product.price, items: [item] });
+	};
+
 	return (
 		<article className="group">
 			<div className="relative mb-4 aspect-[3/4] overflow-hidden rounded-card bg-secondary">
@@ -30,6 +43,7 @@ export function ProductCardBase({
 					prefetch={false}
 					className="absolute inset-0 z-0 block"
 					aria-label={product.name}
+					onClick={trackSelection}
 				>
 					<Image
 						src={product.image}
@@ -67,7 +81,12 @@ export function ProductCardBase({
 				{imageOverlay ? <div className="absolute inset-0 z-10">{imageOverlay}</div> : null}
 			</div>
 
-			<Link href={product.href} prefetch={false} className="block no-underline hover:no-underline">
+			<Link
+				href={product.href}
+				prefetch={false}
+				className="block no-underline hover:no-underline"
+				onClick={trackSelection}
+			>
 				<div className="space-y-1.5">
 					{product.brand && <p className="text-eyebrow uppercase text-muted-foreground">{product.brand}</p>}
 					<h3

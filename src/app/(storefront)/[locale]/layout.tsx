@@ -1,5 +1,5 @@
 import "../../globals.css";
-import { type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -13,6 +13,7 @@ import {
 } from "@/config/locale";
 import { PersistBrowseLocaleCookie } from "@/ui/components/persist-browse-locale-cookie";
 import { getRootHtmlFontProps } from "@/lib/fonts";
+import { AnalyticsProvider } from "@/ui/components/analytics/analytics-provider";
 
 export const metadata = rootMetadata;
 
@@ -56,6 +57,9 @@ export default async function LocaleRootLayout({
 				<NextIntlClientProvider locale={localeSlug} messages={messages}>
 					<PersistBrowseLocaleCookie locale={localeSlug} />
 					{children}
+					<Suspense fallback={null}>
+						<AnalyticsProvider privacyHref={`/${localeSlug}/nigeria-ngn/privacy`} />
+					</Suspense>
 					<SpeedInsights />
 				</NextIntlClientProvider>
 			</body>

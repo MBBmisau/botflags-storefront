@@ -12,6 +12,7 @@ import { OrderConfirmationPageShell } from "./order-confirmation-page-shell";
 import { PageNotFound } from "@/checkout/views/page-not-found";
 import { useTranslations } from "next-intl";
 import { getLocaleDefinition } from "@/config/locale";
+import { PurchaseTracker } from "@/ui/components/analytics/ecommerce-trackers";
 
 /** Format address for display */
 function formatAddress(address: {
@@ -64,6 +65,21 @@ export const OrderConfirmation = () => {
 
 	return (
 		<OrderConfirmationPageShell storefrontChannel={channel}>
+			<PurchaseTracker
+				transactionId={order.number}
+				currency={order.total.gross.currency}
+				value={order.total.gross.amount}
+				tax={order.total.tax.amount}
+				shipping={order.shippingPrice.gross.amount}
+				coupon={order.voucher?.code ?? undefined}
+				items={order.lines.map((line) => ({
+					item_id: line.id,
+					item_name: line.productName,
+					item_variant: line.variantName || line.variant?.name || undefined,
+					price: line.unitPrice.gross.amount,
+					quantity: line.quantity,
+				}))}
+			/>
 			<main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 				<div className="flex flex-col gap-8 md:flex-row">
 					<div className="order-2 min-w-0 flex-1 md:order-1">
@@ -83,7 +99,7 @@ export const OrderConfirmation = () => {
 								</div>
 
 								<div className="overflow-hidden rounded-lg border border-border">
-									<div className="bg-secondary/50 border-b border-border p-4">
+									<div className="border-b border-border bg-secondary/50 p-4">
 										<h2 className="font-semibold">{t("confirmedTitle")}</h2>
 										<p className="mt-1 text-sm text-muted-foreground">{t("confirmedEmail", { email })}</p>
 									</div>

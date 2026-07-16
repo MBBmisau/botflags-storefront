@@ -17,6 +17,9 @@ import { hasDiscount } from "@/lib/pricing";
 import { buildCheckoutPath } from "@paper/session-bridge";
 import type { CartContent, StorefrontPolicies } from "@/lib/content";
 import { formatContentLabel } from "@/lib/content/format-label";
+import { trackEvent } from "@/lib/analytics/gtag";
+import { commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
+import { ViewCartTracker } from "@/ui/components/analytics/ecommerce-trackers";
 
 interface CartLine {
 	id: string;
@@ -151,11 +154,29 @@ export function CartDrawer({
 
 	const handleRemove = (lineId: string) => {
 		if (!checkoutId) return;
+		const line = lines.find((item) => item.id === lineId);
+		if (line) {
+			const item = commerceLineToAnalyticsItem(line);
+			trackEvent("remove_from_cart", {
+				currency: line.totalPrice.gross.currency,
+				value: item.price * (item.quantity ?? 1),
+				items: [item],
+			});
+		}
 		runCartMutation(() => deleteCartLine(checkoutId, lineId, channel));
 	};
 
 	const handleUpdateQuantity = (lineId: string, newQuantity: number) => {
 		if (!checkoutId || newQuantity < 1) return;
+		const line = lines.find((item) => item.id === lineId);
+		if (line && newQuantity !== line.quantity) {
+			const item = { ...commerceLineToAnalyticsItem(line), quantity: 1 };
+			trackEvent(newQuantity > line.quantity ? "add_to_cart" : "remove_from_cart", {
+				currency: line.totalPrice.gross.currency,
+				value: item.price,
+				items: [item],
+			});
+		}
 		runCartMutation(() => updateCartLineQuantity(checkoutId, lineId, newQuantity, channel));
 	};
 
@@ -180,6 +201,7 @@ export function CartDrawer({
 
 	return (
 		<Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
+			{isOpen && lines.length > 0 ? <ViewCartTracker lines={lines} /> : null}
 			<SheetContent side="right" className="flex flex-col p-0">
 				{/* Header */}
 				<SheetHeader className="justify-between border-b border-border px-6 py-4">
@@ -193,7 +215,7 @@ export function CartDrawer({
 
 				{/* Free Shipping Progress */}
 				{lines.length > 0 && freeShippingEnabled && (
-					<div className="bg-secondary/50 border-b border-border px-6 py-4">
+					<div className="border-b border-border bg-secondary/50 px-6 py-4">
 						<div className="mb-2 flex items-center gap-2 text-sm">
 							<Truck className={cn("h-4 w-4", amountToFreeShipping <= 0 && "text-success")} />
 							{amountToFreeShipping > 0 ? (
