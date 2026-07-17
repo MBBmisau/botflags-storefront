@@ -49,8 +49,10 @@ export function initializeConsentDefaults() {
 	window.dataLayer = window.dataLayer || [];
 	window.gtag =
 		window.gtag ||
-		function gtag(...args: unknown[]) {
-			window.dataLayer?.push(args);
+		function gtag() {
+			// Google Tag's command queue requires the native `arguments` object.
+			// A rest-parameter array looks equivalent but is silently ignored by gtag.js.
+			window.dataLayer?.push(arguments);
 		};
 	window.gtag("consent", "default", {
 		analytics_storage: "denied",

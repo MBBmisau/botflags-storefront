@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
+	initializeConsentDefaults,
 	isAnalyticsDebugMode,
 	sanitizeAnalyticsValue,
 	sanitizePathname,
@@ -13,6 +14,23 @@ afterEach(() => {
 });
 
 describe("analytics data safety", () => {
+	it("queues commands in the native arguments format required by gtag.js", () => {
+		const dataLayer: unknown[] = [];
+		Object.defineProperty(globalThis, "window", {
+			configurable: true,
+			value: { dataLayer },
+		});
+
+		initializeConsentDefaults();
+
+		expect(Array.isArray(dataLayer[0])).toBe(false);
+		expect(Array.from(dataLayer[0] as IArguments)).toEqual([
+			"consent",
+			"default",
+			expect.objectContaining({ analytics_storage: "denied" }),
+		]);
+	});
+
 	it("drops query strings and fragments from manual page views", () => {
 		expect(sanitizePathname("/checkout?checkout=secret&email=a@example.com#payment")).toBe("/checkout");
 		expect(sanitizePathname("en/nigeria-ngn/products/dress?variant=123")).toBe(
