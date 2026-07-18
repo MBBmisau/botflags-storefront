@@ -25,9 +25,9 @@ export function AnalyticsConsentBanner({
 				{isPreferences ? "Analytics preferences" : "Your privacy choices"}
 			</h2>
 			<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-				We use optional Google Analytics cookies to understand how the Botflags store is used and improve the
-				shopping experience. Analytics is off unless you accept. Advertising and personalization remain off.
-				Read our{" "}
+				We use optional Google analytics cookies, managed through Google Tag Manager, to understand how the
+				Botflags store is used and improve the shopping experience. Analytics is off unless you accept.
+				Advertising and personalization remain off. Read our{" "}
 				<Link href={privacyHref} className="font-medium text-foreground underline underline-offset-4">
 					privacy and cookie notice
 				</Link>

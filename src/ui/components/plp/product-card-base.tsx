@@ -10,7 +10,7 @@ import { formatPrice } from "./utils";
 import { PLP_IMAGE_SIZES, PRODUCT_IMAGE_QUALITY } from "@/lib/images";
 import type { ProductCardData } from "./product-card-data";
 import { productCardToAnalyticsItem } from "@/lib/analytics/ecommerce";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 
 export interface ProductCardBaseProps {
 	product: ProductCardData;

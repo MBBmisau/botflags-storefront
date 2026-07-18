@@ -19,7 +19,30 @@ const BLOCKED_KEYS = new Set([
 	"token",
 ]);
 const EMAIL_PATTERN = /\b[^\s@]+@[^\s@]+\.[^\s@]+\b/i;
+const ECOMMERCE_EVENTS = new Set<AnalyticsEventName>([
+	"view_item",
+	"view_item_list",
+	"select_item",
+	"add_to_cart",
+	"remove_from_cart",
+	"view_cart",
+	"begin_checkout",
+	"add_shipping_info",
+	"add_payment_info",
+	"purchase",
+	"view_promotion",
+	"select_promotion",
+]);
+
 let analyticsConsent: AnalyticsConsent = "denied";
+let analyticsDebugMode = false;
+let tagManagerStarted = false;
+
+function getDataLayer(): unknown[] | undefined {
+	if (typeof window === "undefined") return undefined;
+	window.dataLayer = window.dataLayer || [];
+	return window.dataLayer;
+}
 
 export function sanitizePathname(pathname: string): string {
 	const path = pathname.split(/[?#]/, 1)[0] || "/";
@@ -46,12 +69,11 @@ export function sanitizeAnalyticsValue(value: unknown): unknown {
 
 export function initializeConsentDefaults() {
 	if (typeof window === "undefined") return;
-	window.dataLayer = window.dataLayer || [];
+	getDataLayer();
 	window.gtag =
 		window.gtag ||
 		function gtag() {
-			// Google Tag's command queue requires the native `arguments` object.
-			// A rest-parameter array looks equivalent but is silently ignored by gtag.js.
+			// Consent commands must use the native `arguments` queue format expected by Google Tag Manager.
 			window.dataLayer?.push(arguments);
 		};
 	window.gtag("consent", "default", {
@@ -74,17 +96,36 @@ export function updateAnalyticsConsent(consent: AnalyticsConsent) {
 	});
 }
 
+export function prepareTagManager(debugMode: boolean, startedAt = Date.now()) {
+	analyticsDebugMode = debugMode;
+	if (tagManagerStarted) return;
+	getDataLayer()?.push({ "gtm.start": startedAt, event: "gtm.js" });
+	tagManagerStarted = true;
+}
+
 export function trackEvent<Name extends AnalyticsEventName>(
 	name: Name,
 	payload: AnalyticsEventPayloads[Name],
 ) {
 	if (analyticsConsent !== "granted") return;
-	window.gtag?.("event", name, sanitizeAnalyticsValue(payload));
+	const dataLayer = getDataLayer();
+	if (!dataLayer) return;
+
+	const sanitizedPayload = sanitizeAnalyticsValue(payload) as Record<string, unknown>;
+	if (ECOMMERCE_EVENTS.has(name)) {
+		dataLayer.push({ ecommerce: null });
+		dataLayer.push({ event: name, debug_mode: analyticsDebugMode, ecommerce: sanitizedPayload });
+		return;
+	}
+
+	dataLayer.push({ event: name, debug_mode: analyticsDebugMode, ...sanitizedPayload });
 }
 
 export function trackPageView(pathname: string, title?: string) {
 	if (analyticsConsent !== "granted") return;
-	window.gtag?.("event", "page_view", {
+	getDataLayer()?.push({
+		event: "page_view",
+		debug_mode: analyticsDebugMode,
 		page_path: sanitizePathname(pathname),
 		page_title: title,
 	});
@@ -92,4 +133,10 @@ export function trackPageView(pathname: string, title?: string) {
 
 export function canTrackAnalytics(): boolean {
 	return analyticsConsent === "granted";
+}
+
+export function resetTagManagerStateForTests() {
+	analyticsConsent = "denied";
+	analyticsDebugMode = false;
+	tagManagerStarted = false;
 }

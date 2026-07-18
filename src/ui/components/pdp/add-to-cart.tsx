@@ -6,7 +6,7 @@ import { ShoppingBag } from "lucide-react";
 import { Button } from "@/ui/components/ui/button";
 import { DiscountPercentLabel } from "@/ui/components/ui/sale-label";
 import { cn } from "@/lib/utils";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 import type { AnalyticsItem } from "@/lib/analytics/types";
 
 interface AddToCartProps {

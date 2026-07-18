@@ -2,19 +2,22 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
 	initializeConsentDefaults,
 	isAnalyticsDebugMode,
+	prepareTagManager,
+	resetTagManagerStateForTests,
 	sanitizeAnalyticsValue,
 	sanitizePathname,
 	trackEvent,
+	trackPageView,
 	updateAnalyticsConsent,
-} from "./gtag";
+} from "./tag-manager";
 
 afterEach(() => {
-	updateAnalyticsConsent("denied");
+	resetTagManagerStateForTests();
 	Reflect.deleteProperty(globalThis, "window");
 });
 
-describe("analytics data safety", () => {
-	it("queues commands in the native arguments format required by gtag.js", () => {
+describe("Google Tag Manager analytics", () => {
+	it("queues consent commands in the native arguments format", () => {
 		const dataLayer: unknown[] = [];
 		Object.defineProperty(globalThis, "window", {
 			configurable: true,
@@ -59,33 +62,71 @@ describe("analytics data safety", () => {
 		});
 	});
 
-	it("sends typed events only after analytics consent is granted", () => {
-		const calls: unknown[][] = [];
+	it("queues the GTM bootstrap only once and carries debug mode into events", () => {
+		const dataLayer: unknown[] = [];
 		Object.defineProperty(globalThis, "window", {
 			configurable: true,
-			value: { gtag: (...args: unknown[]) => calls.push(args) },
+			value: { dataLayer },
 		});
+
+		prepareTagManager(true, 1234);
+		prepareTagManager(true, 5678);
+		updateAnalyticsConsent("granted");
+		trackPageView("/en/nigeria-ngn/products?debug_mode=true", "Products");
+
+		expect(dataLayer).toEqual([
+			{ "gtm.start": 1234, event: "gtm.js" },
+			{
+				event: "page_view",
+				debug_mode: true,
+				page_path: "/en/nigeria-ngn/products",
+				page_title: "Products",
+			},
+		]);
+	});
+
+	it("clears ecommerce state before each typed ecommerce event", () => {
+		const dataLayer: unknown[] = [];
+		Object.defineProperty(globalThis, "window", {
+			configurable: true,
+			value: { dataLayer },
+		});
+		prepareTagManager(true, 1234);
+		updateAnalyticsConsent("granted");
 		const payload = {
 			currency: "NGN",
 			value: 30_000,
 			items: [{ item_id: "p1", item_name: "Dress", price: 30_000 }],
 		};
 
-		updateAnalyticsConsent("denied");
 		trackEvent("view_item", payload);
-		expect(calls.filter(([command]) => command === "event")).toHaveLength(0);
+
+		expect(dataLayer.slice(-2)).toEqual([
+			{ ecommerce: null },
+			{ event: "view_item", debug_mode: true, ecommerce: payload },
+		]);
+	});
+
+	it("sends search and authentication parameters at event scope only after consent", () => {
+		const dataLayer: unknown[] = [];
+		Object.defineProperty(globalThis, "window", {
+			configurable: true,
+			value: { dataLayer },
+		});
+		prepareTagManager(false, 1234);
+
+		trackEvent("search", { search_term: "ignored" });
+		expect(dataLayer).toHaveLength(1);
 
 		updateAnalyticsConsent("granted");
-		trackEvent("view_item", payload);
-		expect(calls.at(-1)).toEqual(["event", "view_item", payload]);
-
 		trackEvent("search", { search_term: "black dress" });
 		trackEvent("login", { method: "email" });
 		trackEvent("sign_up", { method: "email" });
-		expect(calls.slice(-3)).toEqual([
-			["event", "search", { search_term: "black dress" }],
-			["event", "login", { method: "email" }],
-			["event", "sign_up", { method: "email" }],
+
+		expect(dataLayer.slice(-3)).toEqual([
+			{ event: "search", debug_mode: false, search_term: "black dress" },
+			{ event: "login", debug_mode: false, method: "email" },
+			{ event: "sign_up", debug_mode: false, method: "email" },
 		]);
 	});
 });

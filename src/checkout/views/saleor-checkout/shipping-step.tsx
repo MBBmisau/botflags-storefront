@@ -19,7 +19,7 @@ import { MobileStickyAction } from "./mobile-sticky-action";
 import { useCheckoutStepNumber } from "@/checkout/hooks/use-checkout-steps";
 import { useTranslations } from "next-intl";
 import { cartValue, commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 
 interface ShippingStepProps {
 	checkout: CheckoutFragment;

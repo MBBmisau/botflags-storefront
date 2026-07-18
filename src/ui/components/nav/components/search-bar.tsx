@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 import { buildStorefrontPath } from "@/lib/storefront-path";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 
 export const SearchBar = ({
 	locale,

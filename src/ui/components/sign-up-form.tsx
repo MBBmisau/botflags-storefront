@@ -11,7 +11,7 @@ import { Label } from "@/ui/components/ui/label";
 import { buildAccountConfirmationRedirectUrl } from "@/lib/auth/account-confirmation-url";
 import { buildStorefrontPath } from "@/lib/storefront-path";
 import { cn } from "@/lib/utils";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 
 export function SignUpForm() {
 	const t = useTranslations("account");

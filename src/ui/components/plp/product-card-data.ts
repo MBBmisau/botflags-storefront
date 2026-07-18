@@ -5,7 +5,7 @@ export interface ProductCardData {
 	slug: string;
 	brand?: string | null;
 	price: number;
-	/** Discounted net price and stable SKU/variant identifier used only for GA4. */
+	/** Discounted net price and stable SKU/variant identifier used only for analytics. */
 	analyticsPrice?: number;
 	analyticsCompareAtPrice?: number | null;
 	analyticsItemId?: string;

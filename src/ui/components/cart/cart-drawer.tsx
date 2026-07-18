@@ -17,7 +17,7 @@ import { hasDiscount } from "@/lib/pricing";
 import { buildCheckoutPath } from "@paper/session-bridge";
 import type { CartContent, StorefrontPolicies } from "@/lib/content";
 import { formatContentLabel } from "@/lib/content/format-label";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 import { commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
 import { ViewCartTracker } from "@/ui/components/analytics/ecommerce-trackers";
 

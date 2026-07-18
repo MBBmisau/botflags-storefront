@@ -16,7 +16,7 @@ import {
 } from "@/ui/components/ui/carousel";
 import { PromotionViewTracker } from "@/ui/components/analytics/ecommerce-trackers";
 import { promotionPayload, type AnalyticsPromotion } from "@/lib/analytics/ecommerce";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 
 function VisiblePromotionTracker({ promotions }: { promotions: readonly AnalyticsPromotion[] }) {
 	const { selectedIndex } = useCarousel();

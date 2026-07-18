@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { ariaDisabledClassName } from "@/ui/components/ui/button";
 import { cn } from "@/lib/utils";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 import type { AnalyticsItem } from "@/lib/analytics/types";
 
 type Props = {

@@ -12,14 +12,15 @@ import {
 import {
 	initializeConsentDefaults,
 	isAnalyticsDebugMode,
+	prepareTagManager,
 	trackPageView,
 	updateAnalyticsConsent,
-} from "@/lib/analytics/gtag";
+} from "@/lib/analytics/tag-manager";
 import type { AnalyticsConsent } from "@/lib/analytics/types";
 import { AnalyticsConsentBanner } from "./analytics-consent-banner";
 
-const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() ?? "";
-const isConfigured = /^G-[A-Z0-9]+$/.test(measurementId);
+const containerId = process.env.NEXT_PUBLIC_GTM_ID?.trim() ?? "";
+const isConfigured = /^GTM-[A-Z0-9]+$/.test(containerId);
 
 function ManualPageViews({ ready }: { ready: boolean }) {
 	const pathname = usePathname();
@@ -40,7 +41,14 @@ export function AnalyticsProvider({ privacyHref }: { privacyHref: string }) {
 	useEffect(() => {
 		initializeConsentDefaults();
 		const saved = parseConsentCookie(document.cookie);
-		if (saved) updateAnalyticsConsent(saved);
+		const debugMode = isAnalyticsDebugMode(
+			window.location.search,
+			process.env.NEXT_PUBLIC_ANALYTICS_DEBUG === "true",
+		);
+		if (saved) {
+			updateAnalyticsConsent(saved);
+			if (saved === "granted") prepareTagManager(debugMode);
+		}
 		queueMicrotask(() => setConsent(saved));
 
 		const openPreferences = () => setPreferencesOpen(true);
@@ -53,7 +61,13 @@ export function AnalyticsProvider({ privacyHref }: { privacyHref: string }) {
 		setConsent(nextConsent);
 		setPreferencesOpen(false);
 		updateAnalyticsConsent(nextConsent);
-		if (nextConsent === "denied") setTagReady(false);
+		if (nextConsent === "granted") {
+			prepareTagManager(
+				isAnalyticsDebugMode(window.location.search, process.env.NEXT_PUBLIC_ANALYTICS_DEBUG === "true"),
+			);
+		} else {
+			setTagReady(false);
+		}
 	};
 
 	const shouldShowBanner = isConfigured && consent !== undefined && (consent === null || preferencesOpen);
@@ -63,20 +77,10 @@ export function AnalyticsProvider({ privacyHref }: { privacyHref: string }) {
 		<>
 			{shouldLoadTag ? (
 				<Script
-					id="botflags-ga4"
-					src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
+					id="botflags-gtm"
+					src={`https://www.googletagmanager.com/gtm.js?id=${containerId}`}
 					strategy="afterInteractive"
 					onReady={() => {
-						window.gtag?.("js", new Date());
-						window.gtag?.("config", measurementId, {
-							send_page_view: false,
-							allow_google_signals: false,
-							allow_ad_personalization_signals: false,
-							debug_mode: isAnalyticsDebugMode(
-								window.location.search,
-								process.env.NEXT_PUBLIC_GA_DEBUG === "true",
-							),
-						});
 						setTagReady(true);
 						window.dispatchEvent(new Event(ANALYTICS_READY_EVENT));
 					}}

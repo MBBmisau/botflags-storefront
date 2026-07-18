@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { ANALYTICS_READY_EVENT } from "@/lib/analytics/consent";
-import { canTrackAnalytics, trackEvent } from "@/lib/analytics/gtag";
+import { canTrackAnalytics, trackEvent } from "@/lib/analytics/tag-manager";
 import {
 	cartValue,
 	claimPurchase,

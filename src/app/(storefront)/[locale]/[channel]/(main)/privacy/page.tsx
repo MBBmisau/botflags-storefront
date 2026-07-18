@@ -21,12 +21,12 @@ export default function PrivacyPage() {
 					fraud, and respond to support requests. Optional analytics is disabled unless you choose to accept
 					it.
 				</p>
-				<h2>Google Analytics 4</h2>
+				<h2>Google Tag Manager and Google Analytics 4</h2>
 				<p>
-					If you accept analytics, Google Analytics 4 records sanitized page paths and ecommerce actions such
-					as product views, cart activity, checkout progress, and completed purchase totals in NGN. We do not
-					send your email address, phone number, delivery address, customer name, checkout token, or payment
-					details to Google Analytics.
+					If you accept analytics, Google Tag Manager loads our Google Analytics 4 configuration and forwards
+					sanitized page paths and ecommerce actions such as product views, cart activity, checkout progress,
+					and completed purchase totals in NGN. We do not send your email address, phone number, delivery
+					address, customer name, checkout token, or payment details to Google Analytics.
 				</p>
 				<h2>Your choice</h2>
 				<p>

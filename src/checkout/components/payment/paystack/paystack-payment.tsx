@@ -31,7 +31,7 @@ import { updateCheckoutBilling } from "@/checkout/lib/payment/update-billing";
 import { Button } from "@/ui/components/ui/button";
 import { LoadingSpinner } from "@/checkout/ui-kit/loading-spinner";
 import { cartValue, commerceLineToAnalyticsItem } from "@/lib/analytics/ecommerce";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 
 type PaystackBillingContext = {
 	billingData: BillingAddressData;

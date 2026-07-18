@@ -8,7 +8,7 @@ import { Button } from "@/ui/components/ui/button";
 import { Input } from "@/ui/components/ui/input";
 import { requestCheckoutPasswordReset } from "@/app/(checkout)/actions";
 import { contactFieldAttributes } from "@/checkout/lib/consts/input-attributes";
-import { trackEvent } from "@/lib/analytics/gtag";
+import { trackEvent } from "@/lib/analytics/tag-manager";
 
 export interface SignInFormProps {
 	/** Pre-filled email address */
